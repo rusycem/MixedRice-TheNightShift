@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 145021057}
   - component: {fileID: 145021056}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: eyes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1776,8 +1776,8 @@ SceneRoots:
   - {fileID: 1894121963}
   - {fileID: 1800167044}
   - {fileID: 1213833924}
-  - {fileID: 683051157}
   - {fileID: 1294607755}
+  - {fileID: 683051157}
   - {fileID: 1102963830}
   - {fileID: 514231135}
   - {fileID: 679166736}

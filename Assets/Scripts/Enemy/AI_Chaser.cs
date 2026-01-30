@@ -21,8 +21,15 @@ public class AI_Chaser : MonoBehaviour
 
     void Start()
     {
-        if (agent == null) agent = GetComponent<NavMeshAgent>();
-        if (anim == null) anim = GetComponent<Animator>();
+        if (agent == null)
+        {
+            agent = GetComponent<NavMeshAgent>();
+        }
+        
+        if (anim == null)
+        {
+            anim = GetComponent<Animator>();
+        }
         
         GoToNextPatrolPoint();
     }
