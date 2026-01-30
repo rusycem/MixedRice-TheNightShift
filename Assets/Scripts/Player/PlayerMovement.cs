@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+
     [Header("Movement Settings")]
     public CharacterController controller;
     public float walkSpeed = 6f;
@@ -19,6 +20,9 @@ public class PlayerMovement : MonoBehaviour
     [Header("Gravity")]
     public float gravityMultiplier = 2f;
 
+    [Header("Events")]
+    public GameEvent onPlayerDied;
+
     private Vector2 moveInput;
     private Vector2 lookInput;
     private bool isRunning;
@@ -30,6 +34,24 @@ public class PlayerMovement : MonoBehaviour
     {
         HandleMovement();
         ApplyLook();
+    }
+
+    //testing dead function (irfan)
+    public void OnDie(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            HandleDeath();
+        }
+    }
+    public void HandleDeath()
+    {
+        onPlayerDied?.Raise();
+
+        Cursor.lockState = CursorLockMode.None; // unlock mouse
+        Cursor.visible = true;  // cursor on
+
+        this.enabled = false;
     }
 
     private void HandleMovement()
