@@ -397,7 +397,7 @@ MonoBehaviour:
   runSpeed: 11
   disableControl: 0
   cameraTarget: {fileID: 1707005173}
-  lookSpeed: 7
+  lookSpeed: 10
   minPitch: -80
   maxPitch: 80
   invertY: 0
@@ -566,10 +566,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HeadBobController
   _enable: 1
-  _Amplitude: 0.0035
-  _frequency: 10
   _camera: {fileID: 1707005173}
   _cameraHolder: {fileID: 919554828}
+  _walkThreshold: 2
+  _runThreshold: 7
+  _idleAmp: 0.005
+  _idleFreq: 1.5
+  _walkAmp: 0.007
+  _walkFreq: 12
+  _runAmp: 0.02
+  _runFreq: 16
 --- !u!1 &919554827
 GameObject:
   m_ObjectHideFlags: 0
