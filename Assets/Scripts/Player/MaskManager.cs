@@ -97,52 +97,52 @@ public class MaskManager : MonoBehaviour
             if (currentMaskTime <= 0f)
             {
                 currentMaskTime = 0f;
+
+                // Turn off mask & trigger OFF animation
                 isMaskOn = false;
                 regenDelayTimer = regenDelay;
                 maskEmpty = true;
                 isRegenerating = false;
-                Debug.Log("Mask ran out, waiting to regen");
 
-                if (maskVisual != null)
-                    maskVisual.SetActive(false);
+                Debug.Log("Mask ran out, playing OFF animation");
+
+                if (!isAnimating)
+                    StartCoroutine(AutoMaskOff());
             }
         }
         else if (maskEmpty)
         {
-            if (maskEmpty)
+            if (regenDelayTimer > 0f)
             {
-                if (regenDelayTimer > 0f)
-                {
-                    regenDelayTimer -= Time.deltaTime;
-                }
-                else
-                {
-                    isRegenerating = true;
-                    currentMaskTime += regenSpeed * Time.deltaTime;
-                    currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
+                regenDelayTimer -= Time.deltaTime;
+            }
+            else
+            {
+                currentMaskTime += regenSpeed * Time.deltaTime;
+                currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
 
-                    if (currentMaskTime >= maxMaskTime)
-                    {
-                        currentMaskTime = maxMaskTime;
-                        isRegenerating = false;
-                        maskEmpty = false;
-                    }
-                }
-                if (regenDelayTimer > 0f)
+                if (currentMaskTime >= maxMaskTime)
                 {
-                    regenDelayTimer -= Time.deltaTime;
-                }
-                else
-                {
-                    currentMaskTime += regenSpeed * Time.deltaTime;
-                    currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
-
-                    if (currentMaskTime >= maxMaskTime)
-                        maskEmpty = false;
+                    currentMaskTime = maxMaskTime;
+                    maskEmpty = false;
+                    isRegenerating = false;
                 }
             }
         }
+    }
 
+    IEnumerator AutoMaskOff()
+    {
+        isAnimating = true;
+
+        maskAnimator.SetTrigger("OffMask");
+
+        yield return new WaitForSeconds(animationDuration);
+
+        if (maskVisual != null)
+            maskVisual.SetActive(false);
+
+        isAnimating = false;
     }
 
 }
