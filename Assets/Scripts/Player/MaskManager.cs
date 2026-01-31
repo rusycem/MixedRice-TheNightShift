@@ -10,8 +10,9 @@ public class MaskManager : MonoBehaviour
 
     [Header("Animation")]
     public Animator maskAnimator;
-    public GameObject maskVisual; 
-    public float animationDuration = 0.5f; 
+    public GameObject maskVisual;
+    public float animationDuration = 0.5f;
+
     public bool isMaskOn { get; private set; }
 
     private float currentMaskTime;
@@ -19,16 +20,20 @@ public class MaskManager : MonoBehaviour
     private bool maskEmpty = false;
     private bool isAnimating = false;
 
+    private int lastSecond = -1;
+
     private void Start()
     {
         currentMaskTime = maxMaskTime;
-        if (maskVisual != null) //hide mask
+
+        if (maskVisual != null)
             maskVisual.SetActive(false);
     }
 
     private void Update()
     {
         UpdateMaskTime();
+        DebugCountdown();
     }
 
     public void ToggleMask()
@@ -53,14 +58,17 @@ public class MaskManager : MonoBehaviour
         }
         else
         {
+            // Play OFF animation first
             maskAnimator.SetTrigger("OffMask");
             isMaskOn = false;
         }
 
         Debug.Log(isMaskOn ? "Mask ON" : "Mask OFF");
 
-        yield return new WaitForSeconds(animationDuration); //wait for anim
+        // Wait until animation finishes
+        yield return new WaitForSeconds(animationDuration);
 
+        // Hide mask AFTER OFF animation
         if (!isMaskOn && maskVisual != null)
             maskVisual.SetActive(false);
 
@@ -100,5 +108,21 @@ public class MaskManager : MonoBehaviour
                     maskEmpty = false;
             }
         }
+    }
+
+    void DebugCountdown()
+    {
+        int second = Mathf.CeilToInt(currentMaskTime);
+        if (second == lastSecond) return;
+
+        lastSecond = second;
+
+        string state =
+            isMaskOn ? "Mask Draining" :
+            (maskEmpty && regenDelayTimer > 0f) ? "Waiting to Regen" :
+            (maskEmpty) ? "Mask Regenerating" :
+            "Mask Full";
+
+        Debug.Log($"{state}: {second}s");
     }
 }
