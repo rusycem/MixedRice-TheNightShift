@@ -2,10 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
-{
-    [Header("Mask Settings")]
-    public bool isMaskOn;
-
+{ 
     [Header("Movement Settings")]
     public CharacterController controller;
     public float walkSpeed = 6f;
@@ -19,11 +16,12 @@ public class PlayerMovement : MonoBehaviour
     public float maxPitch = 80f;
     public bool invertY = false;
 
-    [Header("Gravity")]
-    public float gravityMultiplier = 2f;
-
     [Header("Events")]
     public GameEvent onPlayerDied;
+
+    [Header("Other")]
+    public float gravityMultiplier = 2f;
+    public MaskManager maskManager;
 
     private Vector2 moveInput;
     private Vector2 lookInput;
@@ -32,6 +30,12 @@ public class PlayerMovement : MonoBehaviour
     private float cameraPitch;
     private float verticalVelocity;
 
+    private void Start()
+    {
+        // hide cursor
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
     private void Update()
     {
         HandleMovement();
@@ -42,12 +46,10 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!value.isPressed) return;
 
-        isMaskOn = !isMaskOn;
+        maskManager?.ToggleMask();
 
-        if (isMaskOn)
-            isRunning = false;
-
-        Debug.Log("Mask " + (isMaskOn ? "ON" : "OFF"));
+        if (maskManager != null && maskManager.isMaskOn)
+            isRunning = false; // prevent running while mask is on
     }
 
     //testing dead function (irfan)
@@ -66,6 +68,8 @@ public class PlayerMovement : MonoBehaviour
         Cursor.lockState = CursorLockMode.None; // unlock mouse
         Cursor.visible = true; // cursor on
         Debug.Log("Player dead!");
+        Cursor.visible = true;  // cursor on
+        //Time.timeScale = 0; pause? discuss later
 
         this.enabled = false;
     }
@@ -74,7 +78,8 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!controller) return;
 
-        float speed = (isRunning && !isMaskOn) ? runSpeed : walkSpeed;
+        bool maskActive = maskManager != null && maskManager.isMaskOn;
+        float speed = (isRunning && !maskActive) ? runSpeed : walkSpeed;
 
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
         move.Normalize();
@@ -83,11 +88,10 @@ public class PlayerMovement : MonoBehaviour
             verticalVelocity = -2f;
 
         verticalVelocity += Physics.gravity.y * gravityMultiplier * Time.deltaTime;
-
         Vector3 velocity = move * speed + Vector3.up * verticalVelocity;
-
         controller.Move(velocity * Time.deltaTime);
     }
+
 
     private void ApplyLook()
     {
@@ -131,9 +135,9 @@ public class PlayerMovement : MonoBehaviour
     {
         if (disableControl) return;
 
-        if (isMaskOn)
+        if (maskManager != null && maskManager.isMaskOn)
         {
-            if (value.isPressed) // debug line, can delete these 2 later
+            if (value.isPressed)
                 Debug.Log("Cannot sprint while wearing mask");
 
             isRunning = false;
