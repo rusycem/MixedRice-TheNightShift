@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -23,22 +22,15 @@ public class PlayerMovement : MonoBehaviour
     public GameEvent onTogglePause;
 
     [Header("Stamina Settings")]
-    public float maxStamina = 5f;
-    public float staminaDrainRate = 1f;
-    public float staminaRegenRate = 0.5f;
-    public bool showDebugStamina = true;
+    public float maxStamina = 5f;          
+    public float staminaDrainRate = 1f;  
+    public float staminaRegenRate = 0.5f; 
+    public bool showDebugStamina = true;   
 
     [Header("Other")]
     public float gravityMultiplier = 2f;
     public MaskManager maskManager;
     public Slider staminaSlider;
-
-    [Header("Footstep Audio")]
-    public List<AudioClip> footstepClips;
-    public float walkStepInterval = 0.5f;
-    public float runStepInterval = 0.3f;
-    public float minPitchStep = 0.9f;
-    public float maxPitchStep = 1.1f;
 
     private Vector2 moveInput;
     private Vector2 lookInput;
@@ -48,10 +40,8 @@ public class PlayerMovement : MonoBehaviour
     private float verticalVelocity;
 
     private float currentStamina;
-    private bool isPaused = false;
 
-    private float footstepTimer;
-    private AudioSource footstepSource;
+    private bool isPaused = false;
 
     private void Start()
     {
@@ -66,16 +56,13 @@ public class PlayerMovement : MonoBehaviour
             staminaSlider.value = currentStamina;
         }
 
+        // HARD RESET camera look to forward
         cameraPitch = 0f;
 
         if (cameraTarget != null)
         {
             cameraTarget.localEulerAngles = Vector3.zero;
         }
-
-        // Setup footstep audio source
-        footstepSource = gameObject.AddComponent<AudioSource>();
-        footstepSource.spatialBlend = 1f; // 3D sound
     }
 
     private void Update()
@@ -83,22 +70,17 @@ public class PlayerMovement : MonoBehaviour
         HandleMovement();
         ApplyLook();
         HandleStamina();
-        HandleFootsteps();
     }
-
     private void HandleStamina()
     {
         if (isRunning && moveInput.magnitude > 0 && !maskManager.isMaskOn)
         {
             currentStamina -= staminaDrainRate * Time.deltaTime;
-
             if (currentStamina <= 0f)
             {
                 currentStamina = 0f;
                 isRunning = false;
-
-                if (showDebugStamina)
-                    Debug.Log("Stamina depleted! Cannot sprint.");
+                Debug.Log("Stamina depleted! Cannot sprint.");
             }
         }
         else
@@ -108,10 +90,10 @@ public class PlayerMovement : MonoBehaviour
                 currentStamina = maxStamina;
         }
 
+        // Update the UI
         if (staminaSlider != null)
             staminaSlider.value = currentStamina;
     }
-
     private void HandleMovement()
     {
         if (!controller) return;
@@ -126,11 +108,9 @@ public class PlayerMovement : MonoBehaviour
             verticalVelocity = -2f;
 
         verticalVelocity += Physics.gravity.y * gravityMultiplier * Time.deltaTime;
-
         Vector3 velocity = move * speed + Vector3.up * verticalVelocity;
         controller.Move(velocity * Time.deltaTime);
     }
-
     private void ApplyLook()
     {
         if (!cameraTarget) return;
@@ -145,42 +125,10 @@ public class PlayerMovement : MonoBehaviour
 
         cameraPitch = Mathf.Clamp(cameraPitch - pitch, minPitch, maxPitch);
         cameraTarget.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
-    }
+        //cameraPitch -= pitch;
+        //cameraPitch = Mathf.Clamp(cameraPitch, minPitch, maxPitch);
 
-    private void HandleFootsteps()
-    {
-        if (!controller.isGrounded) return;
-
-        bool isMoving = moveInput.magnitude > 0.1f;
-
-        if (!isMoving)
-        {
-            footstepTimer = 0f;
-            return;
-        }
-
-        bool maskActive = maskManager != null && maskManager.isMaskOn;
-        bool sprinting = isRunning && !maskActive && currentStamina > 0f;
-
-        float interval = sprinting ? runStepInterval : walkStepInterval;
-
-        footstepTimer -= Time.deltaTime;
-
-        if (footstepTimer <= 0f)
-        {
-            PlayFootstep();
-            footstepTimer = interval;
-        }
-    }
-
-    private void PlayFootstep()
-    {
-        if (footstepClips == null || footstepClips.Count == 0) return;
-
-        int index = Random.Range(0, footstepClips.Count);
-
-        footstepSource.pitch = Random.Range(minPitchStep, maxPitchStep);
-        footstepSource.PlayOneShot(footstepClips[index]);
+        //cameraTarget.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
     }
 
     private void OnMove(InputValue value)
@@ -228,7 +176,7 @@ public class PlayerMovement : MonoBehaviour
         maskManager?.ToggleMask();
 
         if (maskManager != null && maskManager.isMaskOn)
-            isRunning = false;
+            isRunning = false; // prevent running while mask is on
     }
 
     public void OnPause(InputValue value)
@@ -243,10 +191,12 @@ public class PlayerMovement : MonoBehaviour
     {
         isPaused = !isPaused;
 
+        // Use a ternary or simple if/else to ensure these ALWAYS fire together
         Time.timeScale = isPaused ? 0f : 1f;
         Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = isPaused;
 
+        // This notifies your PauseMenuController
         onTogglePause?.Raise();
     }
 
@@ -256,6 +206,7 @@ public class PlayerMovement : MonoBehaviour
         {
             TogglePause();
             Debug.Log("Pressed");
+
         }
     }
 
@@ -273,8 +224,8 @@ public class PlayerMovement : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-
         Debug.Log("Player dead!");
+
         this.enabled = false;
     }
 }
