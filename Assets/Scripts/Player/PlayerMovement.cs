@@ -22,10 +22,10 @@ public class PlayerMovement : MonoBehaviour
     public GameEvent onTogglePause;
 
     [Header("Stamina Settings")]
-    public float maxStamina = 5f;          // Max seconds of sprint
-    public float staminaDrainRate = 1f;    // Stamina drained per second while running
-    public float staminaRegenRate = 0.5f;  // Stamina regenerated per second when not running
-    public bool showDebugStamina = true;   // Optional: Debug stamina in console
+    public float maxStamina = 5f;          
+    public float staminaDrainRate = 1f;  
+    public float staminaRegenRate = 0.5f; 
+    public bool showDebugStamina = true;   
 
     [Header("Other")]
     public float gravityMultiplier = 2f;
@@ -45,7 +45,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
-        // hide cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -56,7 +55,18 @@ public class PlayerMovement : MonoBehaviour
             staminaSlider.maxValue = maxStamina;
             staminaSlider.value = currentStamina;
         }
+
+        // HARD RESET camera look to forward
+        cameraPitch = 0f;
+
+        if (cameraTarget != null)
+        {
+            cameraTarget.localEulerAngles = Vector3.zero;
+        }
     }
+
+
+
 
     private void Update()
     {
@@ -119,9 +129,12 @@ public class PlayerMovement : MonoBehaviour
 
         transform.Rotate(Vector3.up * yaw);
 
-        cameraPitch = Mathf.Clamp(cameraPitch - pitch, minPitch, maxPitch);
-        cameraTarget.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
+        cameraPitch -= pitch;
+        cameraPitch = Mathf.Clamp(cameraPitch, minPitch, maxPitch);
+
+        cameraTarget.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
     }
+
 
     private void OnMove(InputValue value)
     {
