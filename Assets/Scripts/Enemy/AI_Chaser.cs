@@ -12,6 +12,7 @@ public class AI_Chaser : MonoBehaviour
     [Header("Patrol Settings")]
     [SerializeField] private Transform[] patrolPoints;
     [SerializeField] private float idleWaitTime = 3f;
+    [SerializeField] private float lostPlayerIdleTime = 2f;
     private bool isWaiting = false;
     private int currentPointIndex = -1;
 
@@ -68,8 +69,7 @@ public class AI_Chaser : MonoBehaviour
             if (isChasing)
             {
                 isChasing = false;
-                agent.speed = 3f;
-                GoToNextPatrolPoint(); 
+                StartCoroutine(LostPlayerDelay()); 
             }
             Patrol();
         }
@@ -99,6 +99,24 @@ public class AI_Chaser : MonoBehaviour
         {
             StartCoroutine(WaitAtPoint());
         }
+    }
+
+    IEnumerator LostPlayerDelay()
+    {
+        isWaiting = true;
+        agent.isStopped = true;
+        agent.velocity = Vector3.zero; // Stop instant slide
+
+        // anim.SetBool("isWalking", false);
+        // anim.SetBool("isChasing", false);
+        // anim.SetBool("isIdle", true);
+
+        Debug.Log("Enemy lost player, searching...");
+        yield return new WaitForSeconds(lostPlayerIdleTime);
+
+        isWaiting = false;
+        agent.speed = 3f;
+        GoToNextPatrolPoint();
     }
 
     IEnumerator WaitAtPoint()
@@ -151,10 +169,6 @@ public class AI_Chaser : MonoBehaviour
             if (!playerIsMasked && onPlayerDied != null)
             {
                 onPlayerDied.Raise();
-            }
-            else if (playerIsMasked)
-            {
-                Debug.Log("Enemy bumped into masked player - ignoring.");
             }
         }
     }
