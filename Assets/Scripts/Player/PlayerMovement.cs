@@ -3,6 +3,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Mask Settings")]
+    public bool isMaskOn;
 
     [Header("Movement Settings")]
     public CharacterController controller;
@@ -36,6 +38,18 @@ public class PlayerMovement : MonoBehaviour
         ApplyLook();
     }
 
+    private void OnMask(InputValue value)
+    {
+        if (!value.isPressed) return;
+
+        isMaskOn = !isMaskOn;
+
+        if (isMaskOn)
+            isRunning = false;
+
+        Debug.Log("Mask " + (isMaskOn ? "ON" : "OFF"));
+    }
+
     //testing dead function (irfan)
     public void OnDie(InputValue value)
     {
@@ -44,12 +58,13 @@ public class PlayerMovement : MonoBehaviour
             HandleDeath();
         }
     }
+
     public void HandleDeath()
     {
         onPlayerDied?.Raise();
 
         Cursor.lockState = CursorLockMode.None; // unlock mouse
-        Cursor.visible = true;  // cursor on
+        Cursor.visible = true; // cursor on
         Debug.Log("Player dead!");
 
         this.enabled = false;
@@ -59,13 +74,11 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!controller) return;
 
-        float speed = isRunning ? runSpeed : walkSpeed;
+        float speed = (isRunning && !isMaskOn) ? runSpeed : walkSpeed;
 
-        // Movement direction
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
         move.Normalize();
 
-        // Gravity
         if (controller.isGrounded)
             verticalVelocity = -2f;
 
@@ -118,6 +131,16 @@ public class PlayerMovement : MonoBehaviour
     {
         if (disableControl) return;
 
+        if (isMaskOn)
+        {
+            if (value.isPressed) // debug line, can delete these 2 later
+                Debug.Log("Cannot sprint while wearing mask");
+
+            isRunning = false;
+            return;
+        }
+
         isRunning = value.isPressed;
     }
+
 }
