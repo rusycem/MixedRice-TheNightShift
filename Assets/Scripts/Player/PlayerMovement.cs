@@ -20,12 +20,12 @@ public class PlayerMovement : MonoBehaviour
     [Header("Events")]
     public GameEvent onPlayerDied;
     public GameEvent onTogglePause;
-
+ 
     [Header("Stamina Settings")]
-    public float maxStamina = 5f;          
-    public float staminaDrainRate = 1f;  
-    public float staminaRegenRate = 0.5f; 
-    public bool showDebugStamina = true;   
+    public float maxStamina = 5f;
+    public float staminaDrainRate = 1f;
+    public float staminaRegenRate = 0.5f;
+    public bool showDebugStamina = true;
 
     [Header("Other")]
     public float gravityMultiplier = 2f;
