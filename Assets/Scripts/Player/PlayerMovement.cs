@@ -22,6 +22,11 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Events")]
     public GameEvent onPlayerDied;
+    public GameEvent onTogglePause;
+
+
+    private bool isPaused = false;
+
 
     private Vector2 moveInput;
     private Vector2 lookInput;
@@ -29,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
 
     private float cameraPitch;
     private float verticalVelocity;
+
 
     private void Update()
     {
@@ -53,6 +59,34 @@ public class PlayerMovement : MonoBehaviour
         //Time.timeScale = 0; pause? discuss later
 
         this.enabled = false;
+    }
+
+    public void OnPause(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            TogglePause();
+        }
+    }
+
+    public void TogglePause()
+    {
+        isPaused = !isPaused;
+
+        if (isPaused)
+        {
+            Time.timeScale = 0f;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            Cursor.lockState = CursorLockMode.Locked; // Changed from None to Locked
+            Cursor.visible = false;
+        }
+
+        onTogglePause?.Raise();
     }
 
     private void HandleMovement()
