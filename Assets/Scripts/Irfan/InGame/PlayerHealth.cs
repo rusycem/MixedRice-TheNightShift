@@ -34,7 +34,7 @@ public class PlayerHealth : MonoBehaviour
         if (playerHP.Value <= 0)
         {
             onPlayerDied.Raise();
-            Time.timeScale = 0f;
+            //Time.timeScale = 0f;
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
         }
