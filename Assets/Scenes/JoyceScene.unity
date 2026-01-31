@@ -1069,8 +1069,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   controller: {fileID: 812585960}
-  walkSpeed: 3.5
-  runSpeed: 10
+  walkSpeed: 2
+  runSpeed: 6
   disableControl: 0
   cameraTarget: {fileID: 1707005173}
   lookSpeed: 10
@@ -1248,8 +1248,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c59bb784595e71c478c38eaedb44b0af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaskManager
-  maxMaskTime: 10
-  regenSpeed: 2
+  maxMaskTime: 8
+  regenSpeed: 1
   regenDelay: 2
 --- !u!114 &812585968
 MonoBehaviour:
