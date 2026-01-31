@@ -60,7 +60,7 @@ Transform:
   m_GameObject: {fileID: 3459872340693371958}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 2.34, y: 25.258333, z: 0.32}
+  m_LocalPosition: {x: 2.34, y: 50, z: 0.32}
   m_LocalScale: {x: 1, y: 1, z: 0.83333325}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -105,7 +105,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 9b4d07556b86bc141be80d4d3b114655, type: 2}
   m_TargetDisplay: 0
@@ -392,9 +392,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c59bb784595e71c478c38eaedb44b0af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaskManager
+  maskFillImage: {fileID: 0}
   maxMaskTime: 8
   regenSpeed: 1
   regenDelay: 2
+  maskAnimator: {fileID: 0}
+  maskVisual: {fileID: 0}
+  animationDuration: 0.5
 --- !u!114 &2014450115204001537
 MonoBehaviour:
   m_ObjectHideFlags: 0
