@@ -73,9 +73,6 @@ Material:
     - _OutlineWidth: 0
     - _PerspectiveFilter: 0.875
     - _Reflectivity: 10
-    - _ScaleRatioA: 0
-    - _ScaleRatioB: 0
-    - _ScaleRatioC: 0
     - _ScaleRatioA: 0.6666667
     - _ScaleRatioB: 0.5416667
     - _ScaleRatioC: 0.5416667
@@ -1459,7 +1456,7 @@ MonoBehaviour:
   m_ClearDynamicDataOnBuild: 0
   m_AtlasWidth: 512
   m_AtlasHeight: 512
-  m_AtlasPadding: 0
+  m_AtlasPadding: 2
   m_AtlasRenderMode: 4165
   m_UsedGlyphRects:
   - m_X: 0
