@@ -12,6 +12,8 @@ public class PlayerHealth : MonoBehaviour
 
     void Start()
     {
+        // reset hp
+        playerHP.Value = playerHP.MaxValue;
         onHealthChanged.Raise();
     }
 
@@ -31,10 +33,7 @@ public class PlayerHealth : MonoBehaviour
 
         if (playerHP.Value <= 0)
         {
-            onPlayerDied.Raise();
-            //Time.timeScale = 0f;
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            onPlayerDied.Raise(); 
         }
     }
 }
