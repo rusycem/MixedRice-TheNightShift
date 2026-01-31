@@ -1,46 +1,64 @@
 using UnityEngine;
-using UnityEngine.AI; // Required for finding valid ground
+using UnityEngine.AI; // Required for NavMesh
+using System.Collections.Generic;
 
 public class ItemSpawner : MonoBehaviour
 {
+    [Header("Items to Spawn")]
+    // Drag your 4 Key Prefabs (Red, Blue, Green, Yellow) here
+    public List<GameObject> distinctKeys;
+
     [Header("Settings")]
-    public GameObject itemPrefab; // Drag your 'FloatingKey' prefab here
-    public float spawnRadius = 10f; // How far to look for a spot
-    public int spawnCount = 3;
+    public float spawnRadius = 20f; // How far to look for spots
+    public float spawnHeightOffset = 0.5f; // Lift item slightly so it floats
 
     void Start()
     {
-        SpawnItems();
+        SpawnAllKeys();
     }
 
-    public void SpawnItems()
+    public void SpawnAllKeys()
     {
-        for (int i = 0; i < spawnCount; i++)
+        // Loop through the list and spawn each specific key once
+        foreach (GameObject keyPrefab in distinctKeys)
         {
-            Vector3 randomPoint = GetRandomPointOnNavMesh();
-
-            // Spawn slightly above ground (y + 0.5) so sprite doesn't clip floor
-            Instantiate(itemPrefab, randomPoint + Vector3.up * 0.5f, Quaternion.identity);
+            SpawnSingleKey(keyPrefab);
         }
     }
 
-    Vector3 GetRandomPointOnNavMesh()
+    void SpawnSingleKey(GameObject prefab)
     {
-        // 1. Pick a random point in a sphere
-        Vector3 randomDirection = Random.insideUnitSphere * spawnRadius;
-        randomDirection += transform.position;
+        // Try to find a valid point 10 times before giving up
+        // (Prevents infinite loops if the map is tiny)
+        for (int i = 0; i < 10; i++)
+        {
+            if (GetRandomPoint(out Vector3 spawnPoint))
+            {
+                Instantiate(prefab, spawnPoint, Quaternion.identity);
+                return; // Success! Stop trying for this key.
+            }
+        }
 
-        // 2. Ask NavMesh: "Is there valid ground near this point?"
+        Debug.LogWarning($"Could not find a spot for {prefab.name}");
+    }
+
+    bool GetRandomPoint(out Vector3 result)
+    {
+        // 1. Pick a random X/Z within a sphere
+        Vector3 randomPoint = transform.position + Random.insideUnitSphere * spawnRadius;
+
+        // 2. Ask NavMesh: "Is there valid BLUE ground near this random point?"
         NavMeshHit hit;
 
-        // 1.0f is the max distance to snap to the floor. 
-        // NavMesh.AllAreas allows it to spawn anywhere walkable.
-        if (NavMesh.SamplePosition(randomDirection, out hit, 5.0f, NavMesh.AllAreas))
+        // 2.0f is the search distance. NavMesh.AllAreas checks all walkble surfaces.
+        if (NavMesh.SamplePosition(randomPoint, out hit, 2.0f, NavMesh.AllAreas))
         {
-            return hit.position;
+            // We found a spot! Adjust Y height so it doesn't clip the floor.
+            result = hit.position + Vector3.up * spawnHeightOffset;
+            return true;
         }
 
-        // If we missed the NavMesh, just return the spawner's position as a fallback
-        return transform.position;
+        result = Vector3.zero;
+        return false;
     }
 }
