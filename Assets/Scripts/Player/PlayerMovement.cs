@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
-{ 
+{
     [Header("Movement Settings")]
     public CharacterController controller;
     public float walkSpeed = 6f;
@@ -20,13 +21,16 @@ public class PlayerMovement : MonoBehaviour
     public GameEvent onPlayerDied;
     public GameEvent onTogglePause;
 
-
-    private bool isPaused = false;
-
+    [Header("Stamina Settings")]
+    public float maxStamina = 5f;          // Max seconds of sprint
+    public float staminaDrainRate = 1f;    // Stamina drained per second while running
+    public float staminaRegenRate = 0.5f;  // Stamina regenerated per second when not running
+    public bool showDebugStamina = true;   // Optional: Debug stamina in console
 
     [Header("Other")]
     public float gravityMultiplier = 2f;
     public MaskManager maskManager;
+    public Slider staminaSlider;
 
     private Vector2 moveInput;
     private Vector2 lookInput;
@@ -35,77 +39,54 @@ public class PlayerMovement : MonoBehaviour
     private float cameraPitch;
     private float verticalVelocity;
 
+    private float currentStamina;
+
+    private bool isPaused = false;
 
     private void Start()
     {
         // hide cursor
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        currentStamina = maxStamina;
+
+        if (staminaSlider != null)
+        {
+            staminaSlider.maxValue = maxStamina;
+            staminaSlider.value = currentStamina;
+        }
     }
+
     private void Update()
     {
         HandleMovement();
         ApplyLook();
+        HandleStamina();
     }
 
-    private void OnMask(InputValue value)
+    private void HandleStamina()
     {
-        if (!value.isPressed) return;
-
-        maskManager?.ToggleMask();
-
-        if (maskManager != null && maskManager.isMaskOn)
-            isRunning = false; // prevent running while mask is on
-    }
-
-    //testing dead function (irfan)
-    public void OnDie(InputValue value)
-    {
-        if (value.isPressed)
+        if (isRunning && moveInput.magnitude > 0 && !maskManager.isMaskOn)
         {
-            HandleDeath();
-        }
-    }
-
-    public void HandleDeath()
-    {
-        onPlayerDied?.Raise();
-
-        Cursor.lockState = CursorLockMode.None; // unlock mouse
-        Cursor.visible = true; // cursor on
-        Debug.Log("Player dead!");
-        Cursor.visible = true;  // cursor on
-        //Time.timeScale = 0; pause? discuss later
-
-        this.enabled = false;
-    }
-
-    public void OnPause(InputValue value)
-    {
-        if (value.isPressed)
-        {
-            TogglePause();
-        }
-    }
-
-    public void TogglePause()
-    {
-        isPaused = !isPaused;
-
-        if (isPaused)
-        {
-            Time.timeScale = 0f;
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            currentStamina -= staminaDrainRate * Time.deltaTime;
+            if (currentStamina <= 0f)
+            {
+                currentStamina = 0f;
+                isRunning = false;
+                Debug.Log("Stamina depleted! Cannot sprint.");
+            }
         }
         else
         {
-            Time.timeScale = 1f;
-            Cursor.lockState = CursorLockMode.Locked; // Changed from None to Locked
-            Cursor.visible = false;
+            currentStamina += staminaRegenRate * Time.deltaTime;
+            if (currentStamina > maxStamina)
+                currentStamina = maxStamina;
         }
 
-        onTogglePause?.Raise();
+        // Update the UI
+        if (staminaSlider != null)
+            staminaSlider.value = currentStamina;
     }
 
     private void HandleMovement()
@@ -125,7 +106,6 @@ public class PlayerMovement : MonoBehaviour
         Vector3 velocity = move * speed + Vector3.up * verticalVelocity;
         controller.Move(velocity * Time.deltaTime);
     }
-
 
     private void ApplyLook()
     {
@@ -178,7 +158,63 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        isRunning = value.isPressed;
+        isRunning = value.isPressed && currentStamina > 0f;
     }
 
+    private void OnMask(InputValue value)
+    {
+        if (!value.isPressed) return;
+
+        maskManager?.ToggleMask();
+
+        if (maskManager != null && maskManager.isMaskOn)
+            isRunning = false; // prevent running while mask is on
+    }
+
+    public void OnPause(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            TogglePause();
+        }
+    }
+
+    public void TogglePause()
+    {
+        isPaused = !isPaused;
+
+        if (isPaused)
+        {
+            Time.timeScale = 0f;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
+        onTogglePause?.Raise();
+    }
+
+    public void OnDie(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            HandleDeath();
+        }
+    }
+
+    public void HandleDeath()
+    {
+        onPlayerDied?.Raise();
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        Debug.Log("Player dead!");
+
+        this.enabled = false;
+    }
 }
