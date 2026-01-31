@@ -35,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
     private float cameraPitch;
     private float verticalVelocity;
 
+
     private void Start()
     {
         // hide cursor
