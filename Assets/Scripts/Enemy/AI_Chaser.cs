@@ -22,6 +22,8 @@ public class AI_Chaser : MonoBehaviour
     [Header("Events")]
     public GameEvent onPlayerDied;
 
+    private MaskManager playerMask;
+
     void Start()
     {
         if (agent == null)
@@ -33,6 +35,11 @@ public class AI_Chaser : MonoBehaviour
         {
             anim = GetComponent<Animator>();
         }
+
+        if (playerTarget != null)
+        {
+            playerMask = playerTarget.GetComponent<MaskManager>();
+        }
         
         GoToNextPatrolPoint();
     }
@@ -43,7 +50,9 @@ public class AI_Chaser : MonoBehaviour
 
         float distanceToPlayer = Vector3.Distance(transform.position, playerTarget.position);
 
-        if (distanceToPlayer < detectionRange)
+        bool canDetectPlayer = (playerMask == null || !playerMask.isMaskOn);
+
+        if (distanceToPlayer < detectionRange && canDetectPlayer)
         {
             if (isWaiting) 
             {
@@ -137,9 +146,15 @@ public class AI_Chaser : MonoBehaviour
     {
         if(other.CompareTag("Player"))
         {
-            if (onPlayerDied != null)
+            bool playerIsMasked = (playerMask != null && playerMask.isMaskOn);
+
+            if (!playerIsMasked && onPlayerDied != null)
             {
                 onPlayerDied.Raise();
+            }
+            else if (playerIsMasked)
+            {
+                Debug.Log("Enemy bumped into masked player - ignoring.");
             }
         }
     }
