@@ -4,6 +4,13 @@ using System.Collections;
 
 public class AI_Chaser : MonoBehaviour
 {
+    public enum EnemyState
+    {
+        Idle = 0,
+        Walk = 1,
+        Chase = 2
+    }
+
     [Header("Components")]
     [SerializeField] private NavMeshAgent agent;
     [SerializeField] private Transform playerTarget;
@@ -13,12 +20,13 @@ public class AI_Chaser : MonoBehaviour
     [SerializeField] private Transform[] patrolPoints;
     [SerializeField] private float idleWaitTime = 3f;
     [SerializeField] private float lostPlayerIdleTime = 2f;
+
     private bool isWaiting = false;
     private int currentPointIndex = -1;
 
-    [Header("AI State")]
-    public bool isChasing = false;
+    [Header("AI Settings")]
     [SerializeField] private float detectionRange = 10f;
+    private bool isChasing = false;
 
     [Header("Events")]
     public GameEvent onPlayerDied;
@@ -27,41 +35,31 @@ public class AI_Chaser : MonoBehaviour
 
     void Start()
     {
-        if (agent == null)
-        {
-            agent = GetComponent<NavMeshAgent>();
-        }
-        
-        if (anim == null)
-        {
-            anim = GetComponent<Animator>();
-        }
+        if (!agent) agent = GetComponent<NavMeshAgent>();
+        if (!anim) anim = GetComponent<Animator>();
 
-        if (playerTarget != null)
-        {
+        if (playerTarget)
             playerMask = playerTarget.GetComponent<MaskManager>();
-        }
-        
+
         GoToNextPatrolPoint();
     }
 
     void Update()
     {
-        if (playerTarget == null) return;
+        if (!playerTarget) return;
 
-        float distanceToPlayer = Vector3.Distance(transform.position, playerTarget.position);
-
+        float distance = Vector3.Distance(transform.position, playerTarget.position);
         bool canDetectPlayer = (playerMask == null || !playerMask.isMaskOn);
 
-        if (distanceToPlayer < detectionRange && canDetectPlayer)
+        if (distance < detectionRange && canDetectPlayer)
         {
-            if (isWaiting) 
+            if (!isChasing)
             {
                 StopAllCoroutines();
                 isWaiting = false;
+                isChasing = true;
             }
-            
-            isChasing = true;
+
             ChasePlayer();
         }
         else
@@ -69,10 +67,16 @@ public class AI_Chaser : MonoBehaviour
             if (isChasing)
             {
                 isChasing = false;
-                StartCoroutine(LostPlayerDelay()); 
+                StartCoroutine(LostPlayerDelay());
             }
+
             Patrol();
         }
+    }
+
+    void SetState(EnemyState state)
+    {
+        anim.SetInteger("AnimState", (int)state);
     }
 
     void ChasePlayer()
@@ -81,52 +85,30 @@ public class AI_Chaser : MonoBehaviour
         agent.speed = 6f;
         agent.destination = playerTarget.position;
 
-        if (!anim.GetBool("isChasing"))
-        {
-            anim.SetBool("isIdle", false);
-            anim.SetBool("isWalking", false);
-            anim.SetBool("isChasing", true);
-        }
+        SetState(EnemyState.Chase);
     }
 
     void Patrol()
     {
         if (isWaiting) return;
 
-        if (agent.isStopped) agent.isStopped = false;
-
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
         {
             StartCoroutine(WaitAtPoint());
         }
-    }
-
-    IEnumerator LostPlayerDelay()
-    {
-        isWaiting = true;
-        agent.isStopped = true;
-        agent.velocity = Vector3.zero; // Stop instant slide
-
-        anim.SetBool("isWalking", false);
-        anim.SetBool("isChasing", false);
-        anim.SetBool("isIdle", true);
-
-        Debug.Log("Enemy lost player, searching...");
-        yield return new WaitForSeconds(lostPlayerIdleTime);
-
-        isWaiting = false;
-        agent.speed = 3f;
-        GoToNextPatrolPoint();
+        else
+        {
+            SetState(EnemyState.Walk);
+        }
     }
 
     IEnumerator WaitAtPoint()
     {
         isWaiting = true;
         agent.isStopped = true;
+        agent.velocity = Vector3.zero;
 
-        anim.SetBool("isWalking", false);
-        anim.SetBool("isChasing", false);
-        anim.SetBool("isIdle", true);
+        SetState(EnemyState.Idle);
 
         yield return new WaitForSeconds(idleWaitTime);
 
@@ -134,37 +116,45 @@ public class AI_Chaser : MonoBehaviour
         GoToNextPatrolPoint();
     }
 
+    IEnumerator LostPlayerDelay()
+    {
+        isWaiting = true;
+        agent.isStopped = true;
+        agent.velocity = Vector3.zero;
+
+        SetState(EnemyState.Idle);
+
+        yield return new WaitForSeconds(lostPlayerIdleTime);
+
+        isWaiting = false;
+        agent.speed = 3f;
+        GoToNextPatrolPoint();
+    }
+
     void GoToNextPatrolPoint()
     {
         if (patrolPoints.Length == 0) return;
 
-        if (patrolPoints.Length > 1)
+        int newIndex = currentPointIndex;
+        while (patrolPoints.Length > 1 && newIndex == currentPointIndex)
         {
-            int newIndex = currentPointIndex;
-            while (newIndex == currentPointIndex)
-            {
-                newIndex = Random.Range(0, patrolPoints.Length);
-            }
-            currentPointIndex = newIndex;
-        }
-        else
-        {
-            currentPointIndex = 0;
+            newIndex = Random.Range(0, patrolPoints.Length);
         }
 
-        agent.isStopped = false; 
+        currentPointIndex = newIndex;
+
+        agent.isStopped = false;
+        agent.speed = 3f;
         agent.destination = patrolPoints[currentPointIndex].position;
 
-        anim.SetBool("isIdle", false);
-        anim.SetBool("isChasing", false);
-        anim.SetBool("isWalking", true);
+        SetState(EnemyState.Walk);
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.CompareTag("Player"))
+        if (other.CompareTag("Player"))
         {
-            bool playerIsMasked = (playerMask != null && playerMask.isMaskOn);
+            bool playerIsMasked = playerMask != null && playerMask.isMaskOn;
 
             if (!playerIsMasked && onPlayerDied != null)
             {
