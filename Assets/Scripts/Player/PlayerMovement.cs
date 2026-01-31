@@ -18,6 +18,11 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Events")]
     public GameEvent onPlayerDied;
+    public GameEvent onTogglePause;
+
+
+    private bool isPaused = false;
+
 
     [Header("Other")]
     public float gravityMultiplier = 2f;
@@ -36,6 +41,7 @@ public class PlayerMovement : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
+
     private void Update()
     {
         HandleMovement();
@@ -72,6 +78,34 @@ public class PlayerMovement : MonoBehaviour
         //Time.timeScale = 0; pause? discuss later
 
         this.enabled = false;
+    }
+
+    public void OnPause(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            TogglePause();
+        }
+    }
+
+    public void TogglePause()
+    {
+        isPaused = !isPaused;
+
+        if (isPaused)
+        {
+            Time.timeScale = 0f;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+            Cursor.lockState = CursorLockMode.Locked; // Changed from None to Locked
+            Cursor.visible = false;
+        }
+
+        onTogglePause?.Raise();
     }
 
     private void HandleMovement()
