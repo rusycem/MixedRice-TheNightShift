@@ -65,16 +65,12 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
-
-
     private void Update()
     {
         HandleMovement();
         ApplyLook();
         HandleStamina();
     }
-
     private void HandleStamina()
     {
         if (isRunning && moveInput.magnitude > 0 && !maskManager.isMaskOn)
@@ -98,7 +94,6 @@ public class PlayerMovement : MonoBehaviour
         if (staminaSlider != null)
             staminaSlider.value = currentStamina;
     }
-
     private void HandleMovement()
     {
         if (!controller) return;
@@ -116,7 +111,6 @@ public class PlayerMovement : MonoBehaviour
         Vector3 velocity = move * speed + Vector3.up * verticalVelocity;
         controller.Move(velocity * Time.deltaTime);
     }
-
     private void ApplyLook()
     {
         if (!cameraTarget) return;
@@ -134,7 +128,6 @@ public class PlayerMovement : MonoBehaviour
 
         cameraTarget.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
     }
-
 
     private void OnMove(InputValue value)
     {
@@ -210,6 +203,8 @@ public class PlayerMovement : MonoBehaviour
         if (isPaused)
         {
             TogglePause();
+            Debug.Log("Pressed");
+
         }
     }
 
