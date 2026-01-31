@@ -1,8 +1,12 @@
 using UnityEngine;
+using UnityEngine.UI; 
 using System.Collections;
 
 public class MaskManager : MonoBehaviour
 {
+    [Header("UI Settings")]
+    public Image maskFillImage;
+
     [Header("Mask Settings")]
     public float maxMaskTime = 10f;
     public float regenSpeed = 2f;
@@ -17,10 +21,10 @@ public class MaskManager : MonoBehaviour
 
     private float currentMaskTime;
     private float regenDelayTimer = 0f;
+    private int lastSecond = -1;
+    private bool isRegenerating = false;
     private bool maskEmpty = false;
     private bool isAnimating = false;
-
-    private int lastSecond = -1;
 
     private void Start()
     {
@@ -33,9 +37,18 @@ public class MaskManager : MonoBehaviour
     private void Update()
     {
         UpdateMaskTime();
-        DebugCountdown();
+        UpdateUI();
+        //DebugCountdown();
     }
 
+
+    void UpdateUI()
+    {
+        if (maskFillImage != null)
+        {
+            maskFillImage.fillAmount = currentMaskTime / maxMaskTime;
+        }
+    }
     public void ToggleMask()
     {
         if (isAnimating) return;
@@ -87,6 +100,7 @@ public class MaskManager : MonoBehaviour
                 isMaskOn = false;
                 regenDelayTimer = regenDelay;
                 maskEmpty = true;
+                isRegenerating = false;
                 Debug.Log("Mask ran out, waiting to regen");
 
                 if (maskVisual != null)
@@ -95,34 +109,40 @@ public class MaskManager : MonoBehaviour
         }
         else if (maskEmpty)
         {
-            if (regenDelayTimer > 0f)
+            if (maskEmpty)
             {
-                regenDelayTimer -= Time.deltaTime;
-            }
-            else
-            {
-                currentMaskTime += regenSpeed * Time.deltaTime;
-                currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
+                if (regenDelayTimer > 0f)
+                {
+                    regenDelayTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    isRegenerating = true;
+                    currentMaskTime += regenSpeed * Time.deltaTime;
+                    currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
 
-                if (currentMaskTime >= maxMaskTime)
-                    maskEmpty = false;
+                    if (currentMaskTime >= maxMaskTime)
+                    {
+                        currentMaskTime = maxMaskTime;
+                        isRegenerating = false;
+                        maskEmpty = false;
+                    }
+                }
+                if (regenDelayTimer > 0f)
+                {
+                    regenDelayTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    currentMaskTime += regenSpeed * Time.deltaTime;
+                    currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
+
+                    if (currentMaskTime >= maxMaskTime)
+                        maskEmpty = false;
+                }
             }
         }
+
     }
 
-    void DebugCountdown()
-    {
-        int second = Mathf.CeilToInt(currentMaskTime);
-        if (second == lastSecond) return;
-
-        lastSecond = second;
-
-        string state =
-            isMaskOn ? "Mask Draining" :
-            (maskEmpty && regenDelayTimer > 0f) ? "Waiting to Regen" :
-            (maskEmpty) ? "Mask Regenerating" :
-            "Mask Full";
-
-        Debug.Log($"{state}: {second}s");
-    }
 }
