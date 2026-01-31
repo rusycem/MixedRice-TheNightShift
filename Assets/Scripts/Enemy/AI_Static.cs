@@ -9,10 +9,14 @@ public class AI_Static : MonoBehaviour
     [SerializeField] private Transform playerTransform;
 
     [Header("Movement")]
-    [SerializeField] private float jumpSpeed = 50f;
+    [SerializeField] private float jumpDistance = 4f; // how many distance per move
     [SerializeField] private float detectionRange = 20f;
-    [SerializeField] private float stopDistance = 4f;
-    [SerializeField] private bool lockRotation = true;
+    [SerializeField] private float stopDistance = 3f;
+
+    [Header("Rotation")]
+    [SerializeField] private float rotationSpeed = 50f;
+
+    private bool wasWatchedLastFrame = true;
 
     void Start()
     {
@@ -25,13 +29,8 @@ public class AI_Static : MonoBehaviour
         {
             playerCamera = Camera.main;
         }
-        
-        agent.stoppingDistance = stopDistance;
 
-        if (lockRotation)
-        {
-            agent.updateRotation = false;
-        }
+        agent.updateRotation = false;
     }
 
     void Update()
@@ -42,32 +41,48 @@ public class AI_Static : MonoBehaviour
 
         if (distanceToPlayer < detectionRange)
         {
-            if (IsBeingWatched())
-            {
-                StopMoving();
-            }
-            else
-            {
-                if (distanceToPlayer > stopDistance)
-                {
-                    StartMoving();
-                }
-                else
-                {
-                    StopMoving();
-                }
-            }
+            FacePlayer();
         }
-        else
+
+        bool currentlyWatched = IsBeingWatched();
+
+        if (distanceToPlayer < detectionRange)
         {
-            StopMoving();
+            if (!currentlyWatched && wasWatchedLastFrame)
+            {
+                PerformInstantJump(distanceToPlayer);
+            }
         }
+
+        wasWatchedLastFrame = currentlyWatched;
+    }
+
+    void FacePlayer()
+    {
+        Vector3 direction = (playerTransform.position - transform.position).normalized;
+        direction.y = 0;
+        
+        if (direction != Vector3.zero)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * rotationSpeed);
+        }
+    }
+
+    void PerformInstantJump(float currentDist)
+    {
+        if (currentDist <= stopDistance) return;
+
+        float actualJumpDist = Mathf.Min(jumpDistance, currentDist - stopDistance);
+        Vector3 directionToPlayer = (playerTransform.position - transform.position).normalized;
+        Vector3 targetPos = transform.position + (directionToPlayer * actualJumpDist);
+
+        agent.Warp(targetPos);
     }
 
     bool IsBeingWatched()
     {
         Vector3 screenPoint = playerCamera.WorldToViewportPoint(transform.position);
-        
         bool isVisibleOnScreen = screenPoint.z > 0 && 
                                  screenPoint.x > 0 && screenPoint.x < 1 && 
                                  screenPoint.y > 0 && screenPoint.y < 1;
@@ -76,30 +91,15 @@ public class AI_Static : MonoBehaviour
         {
             RaycastHit hit;
             Vector3 directionToEnemy = (transform.position - playerCamera.transform.position).normalized;
-
-            if (Physics.Raycast(playerCamera.transform.position, directionToEnemy, out hit, detectionRange))
+            
+            if (Physics.Raycast(playerCamera.transform.position, directionToEnemy, out hit, detectionRange + 5f))
             {
-                if (hit.transform == this.transform)
+                if (hit.transform == this.transform || hit.transform.IsChildOf(this.transform)) 
                 {
                     return true; 
                 }
             }
         }
-
         return false;
-    }
-
-    void StartMoving()
-    {
-        agent.isStopped = false;
-        agent.speed = jumpSpeed;
-        agent.acceleration = 1000f;
-        agent.destination = playerTransform.position;
-    }
-
-    void StopMoving()
-    {
-        agent.isStopped = true;
-        agent.velocity = Vector3.zero;
     }
 }
