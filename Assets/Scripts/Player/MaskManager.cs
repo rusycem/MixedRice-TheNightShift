@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI; 
+using System.Collections;
 
 public class MaskManager : MonoBehaviour
 {
@@ -11,6 +12,11 @@ public class MaskManager : MonoBehaviour
     public float regenSpeed = 2f;
     public float regenDelay = 2f;
 
+    [Header("Animation")]
+    public Animator maskAnimator;
+    public GameObject maskVisual;
+    public float animationDuration = 0.5f;
+
     public bool isMaskOn { get; private set; }
 
     private float currentMaskTime;
@@ -18,10 +24,17 @@ public class MaskManager : MonoBehaviour
     private int lastSecond = -1;
     private bool isRegenerating = false;
     private bool maskEmpty = false;
+    private bool maskEmpty = false;
+    private bool isAnimating = false;
+
+    private int lastSecond = -1;
 
     private void Start()
     {
         currentMaskTime = maxMaskTime;
+
+        if (maskVisual != null)
+            maskVisual.SetActive(false);
     }
 
     private void Update()
@@ -38,6 +51,43 @@ public class MaskManager : MonoBehaviour
         {
             maskFillImage.fillAmount = currentMaskTime / maxMaskTime;
         }
+    public void ToggleMask()
+    {
+        if (isAnimating) return;
+        if (!isMaskOn && currentMaskTime == 0f) return;
+
+        StartCoroutine(PlayMaskToggle());
+    }
+
+    IEnumerator PlayMaskToggle()
+    {
+        isAnimating = true;
+
+        if (!isMaskOn)
+        {
+            if (maskVisual != null)
+                maskVisual.SetActive(true);
+
+            maskAnimator.SetTrigger("OnMask");
+            isMaskOn = true;
+        }
+        else
+        {
+            // Play OFF animation first
+            maskAnimator.SetTrigger("OffMask");
+            isMaskOn = false;
+        }
+
+        Debug.Log(isMaskOn ? "Mask ON" : "Mask OFF");
+
+        // Wait until animation finishes
+        yield return new WaitForSeconds(animationDuration);
+
+        // Hide mask AFTER OFF animation
+        if (!isMaskOn && maskVisual != null)
+            maskVisual.SetActive(false);
+
+        isAnimating = false;
     }
 
     void UpdateMaskTime()
@@ -54,9 +104,12 @@ public class MaskManager : MonoBehaviour
                 maskEmpty = true;
                 isRegenerating = false;
                 Debug.Log("Mask ran out, waiting to regen");
+
+                if (maskVisual != null)
+                    maskVisual.SetActive(false);
             }
         }
-        else
+        else if (maskEmpty)
         {
             if (maskEmpty)
             {
@@ -77,6 +130,17 @@ public class MaskManager : MonoBehaviour
                         maskEmpty = false;
                     }
                 }
+            if (regenDelayTimer > 0f)
+            {
+                regenDelayTimer -= Time.deltaTime;
+            }
+            else
+            {
+                currentMaskTime += regenSpeed * Time.deltaTime;
+                currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
+
+                if (currentMaskTime >= maxMaskTime)
+                    maskEmpty = false;
             }
         }
     }
@@ -101,6 +165,7 @@ public class MaskManager : MonoBehaviour
             isMaskOn ? "Mask Draining" :
             (maskEmpty && regenDelayTimer > 0f) ? "Waiting to Regen" :
             (isRegenerating) ? "Mask Regenerating" :
+            (maskEmpty) ? "Mask Regenerating" :
             "Mask Full";
 
         Debug.Log($"{state}: {second}s");
