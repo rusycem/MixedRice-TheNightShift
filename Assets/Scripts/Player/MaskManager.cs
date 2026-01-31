@@ -5,7 +5,7 @@ public class MaskManager : MonoBehaviour
     [Header("Mask Settings")]
     public float maxMaskTime = 10f;
     public float regenSpeed = 2f;
-    public float regenDelay = 1.5f; // wait before regenerating
+    public float regenDelay = 2f; // regenDelay
 
     public bool isMaskOn { get; private set; }
 
@@ -26,32 +26,30 @@ public class MaskManager : MonoBehaviour
 
     void UpdateMaskTime()
     {
-        // Drain while mask is ON
         if (isMaskOn)
         {
             currentMaskTime -= Time.deltaTime;
+
+            // if mask runs out
+            if (currentMaskTime <= 0f)
+            {
+                currentMaskTime = 0f;
+                isMaskOn = false;
+                regenDelayTimer = regenDelay; 
+                Debug.Log("Mask ran out, waiting to regen");
+            }
         }
         else
         {
-            // Wait before regen
-            if (regenDelayTimer > 0f)
+            if (currentMaskTime == 0f && regenDelayTimer > 0f)
             {
                 regenDelayTimer -= Time.deltaTime;
             }
-            else
+            else if (currentMaskTime == 0f && regenDelayTimer <= 0f)
             {
                 currentMaskTime += regenSpeed * Time.deltaTime;
+                currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
             }
-        }
-
-        currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
-
-        // Mask runs out
-        if (isMaskOn && currentMaskTime == 0f)
-        {
-            isMaskOn = false;
-            regenDelayTimer = regenDelay;
-            Debug.Log("Mask 10s ran out, waiting to regen");
         }
     }
 
@@ -63,13 +61,9 @@ public class MaskManager : MonoBehaviour
 
         isMaskOn = !isMaskOn;
 
-        if (!isMaskOn)
-            regenDelayTimer = regenDelay; // delay regen after manual off
-
-        Debug.Log(isMaskOn ? "Mask ON" : "Mask OFF, waiting to regen");
+        Debug.Log(isMaskOn ? "Mask ON" : "Mask OFF");
     }
 
-    // for debug console
     void DebugCountdown()
     {
         int second = Mathf.CeilToInt(currentMaskTime);
@@ -79,8 +73,8 @@ public class MaskManager : MonoBehaviour
 
         string state =
             isMaskOn ? "Mask Draining" :
-            regenDelayTimer > 0f ? "Waiting to Regen" :
-            currentMaskTime < maxMaskTime ? "Mask Regenerating" :
+            (currentMaskTime == 0f && regenDelayTimer > 0f) ? "Waiting to Regen" :
+            (currentMaskTime < maxMaskTime && currentMaskTime > 0f) ? "Mask Regenerating" :
             "Mask Full";
 
         Debug.Log($"{state}: {second}s");
