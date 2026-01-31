@@ -19,6 +19,9 @@ public class AI_Chaser : MonoBehaviour
     public bool isChasing = false;
     [SerializeField] private float detectionRange = 10f;
 
+    [Header("Events")]
+    public GameEvent onPlayerDied;
+
     void Start()
     {
         if (agent == null)
@@ -128,5 +131,16 @@ public class AI_Chaser : MonoBehaviour
         anim.SetBool("isIdle", false);
         anim.SetBool("isChasing", false);
         anim.SetBool("isWalking", true);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.CompareTag("Player"))
+        {
+            if (onPlayerDied != null)
+            {
+                onPlayerDied.Raise();
+            }
+        }
     }
 }

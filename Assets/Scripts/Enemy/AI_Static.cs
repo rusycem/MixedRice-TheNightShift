@@ -16,6 +16,10 @@ public class AI_Static : MonoBehaviour
     [Header("Rotation")]
     [SerializeField] private float rotationSpeed = 50f;
 
+    [Header("Death Settings")]
+    [SerializeField] private GameEvent onPlayerDied;
+    [SerializeField] private float killRange = 2f;
+
     private bool wasWatchedLastFrame = true;
 
     void Start()
@@ -39,6 +43,12 @@ public class AI_Static : MonoBehaviour
 
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
 
+        if (distanceToPlayer <= killRange)
+        {
+            CheckForKill();
+            return;
+        }
+
         if (distanceToPlayer < detectionRange)
         {
             FacePlayer();
@@ -55,6 +65,15 @@ public class AI_Static : MonoBehaviour
         }
 
         wasWatchedLastFrame = currentlyWatched;
+    }
+
+    void CheckForKill()
+    {
+        PlayerMovement pm = playerTransform.GetComponent<PlayerMovement>();
+        if (pm != null && !pm.disableControl)
+        {
+            onPlayerDied?.Raise();
+        }
     }
 
     void FacePlayer()
