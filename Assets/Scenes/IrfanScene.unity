@@ -1557,10 +1557,10 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 134299622}
   - {fileID: 292115648}
-  - {fileID: 2130364438}
   - {fileID: 653235849}
+  - {fileID: 2130364438}
+  - {fileID: 134299622}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -2022,9 +2022,10 @@ MonoBehaviour:
   minPitch: -80
   maxPitch: 80
   invertY: 0
-  gravityMultiplier: 2
   onPlayerDied: {fileID: 11400000, guid: b9b77f953e0af474bbbe6ca4043759bd, type: 2}
   onTogglePause: {fileID: 11400000, guid: 18bf0cd3aae42e645b5b556913b66c35, type: 2}
+  gravityMultiplier: 2
+  maskManager: {fileID: 0}
 --- !u!143 &1738454635
 CharacterController:
   m_ObjectHideFlags: 0

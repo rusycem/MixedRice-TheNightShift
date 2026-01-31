@@ -55,9 +55,15 @@
                     "name": "TestHitMe",
                     "type": "Button",
                     "id": "3453f7b6-4cbe-477f-962e-2fd47b144ddd",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Mask",
                     "type": "Button",
-                    "id": "936776dc-c449-4c55-8937-87d54cc969be",
+                    "id": "3d4c432e-26e9-4846-aaef-aa7071f074fe",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -271,7 +277,12 @@
                     "processors": "",
                     "groups": "",
                     "action": "TestHitMe",
-                    "id": "d9e28fda-5ff0-4501-9cc4-fe2aa7df7197",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "efa96c89-b244-4de3-9b98-4490975a7a4d",
                     "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
