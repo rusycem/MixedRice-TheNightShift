@@ -51,7 +51,7 @@ public class MaskManager : MonoBehaviour
         {
             isMaskOn = false;
             regenDelayTimer = regenDelay;
-            Debug.Log("Mask 10s ran out — waiting to regen");
+            Debug.Log("Mask 10s ran out, waiting to regen");
         }
     }
 
@@ -66,7 +66,7 @@ public class MaskManager : MonoBehaviour
         if (!isMaskOn)
             regenDelayTimer = regenDelay; // delay regen after manual off
 
-        Debug.Log(isMaskOn ? "Mask ON" : "Mask OFF — waiting to regen");
+        Debug.Log(isMaskOn ? "Mask ON" : "Mask OFF, waiting to regen");
     }
 
     // for debug console
