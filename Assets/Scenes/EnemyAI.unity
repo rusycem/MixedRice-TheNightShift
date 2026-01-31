@@ -751,7 +751,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 322464071314493792, guid: 642913584ff54f64b9e9c3efceb453ef, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -7.08
+      value: -29.7
       objectReference: {fileID: 0}
     - target: {fileID: 322464071314493792, guid: 642913584ff54f64b9e9c3efceb453ef, type: 3}
       propertyPath: m_LocalPosition.y
@@ -2825,6 +2825,7 @@ GameObject:
   - component: {fileID: 1543759372}
   - component: {fileID: 1543759371}
   - component: {fileID: 1543759370}
+  - component: {fileID: 1543759375}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -2866,9 +2867,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 720888c9fc89f1c40a5425199a9de674, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AI_Chaser
-  agent: {fileID: 1543759370}
+  agent: {fileID: 0}
   playerTarget: {fileID: 197040689}
-  anim: {fileID: 1958368632}
+  anim: {fileID: 0}
   patrolPoints:
   - {fileID: 514231135}
   - {fileID: 679166736}
@@ -2944,6 +2945,28 @@ Transform:
   - {fileID: 529925196}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &1543759375
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1543759369}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 24f6f5eb994e28d4ab1398fe8db7dcbf, type: 3}
+  m_Controller: {fileID: 9100000, guid: 90e3a87f1983ca84d9ed5483e0d807c8, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &1561577198
 GameObject:
   m_ObjectHideFlags: 0
@@ -3883,11 +3906,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1951085025}
   m_CullTransparentMesh: 1
---- !u!95 &1958368632 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 24f6f5eb994e28d4ab1398fe8db7dcbf, type: 3}
-  m_PrefabInstance: {fileID: 529925195}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2049839327
 GameObject:
   m_ObjectHideFlags: 0
