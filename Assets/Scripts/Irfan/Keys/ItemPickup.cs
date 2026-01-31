@@ -1,16 +1,26 @@
 using UnityEngine;
 
-public class ItemPickuo : MonoBehaviour
+public class ItemPickup : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [Header("Future Data (Optional for now)")]
+    // The ? lets us check if it exists before trying to use it.
+    public GameEvent onItemPickedUp;
+    public IntVariable itemCounter;
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerEnter(Collider other)
     {
-        
+        if (other.CompareTag("Player"))
+        {
+            // 1. Run Placeholder Logic (Safe Mode)
+            // The '?' means: "Only do this if the slot is NOT empty"
+            itemCounter?.ApplyChange(1);
+            onItemPickedUp?.Raise();
+
+            // 2. Debug so you know it worked
+            Debug.Log("Item Collected! (System ready for data)");
+
+            // 3. Destroy visual
+            Destroy(gameObject);
+        }
     }
 }
