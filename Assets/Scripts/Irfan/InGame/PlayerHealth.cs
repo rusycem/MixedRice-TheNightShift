@@ -12,8 +12,6 @@ public class PlayerHealth : MonoBehaviour
 
     void Start()
     {
-        // reset hp
-        playerHP.Value = playerHP.MaxValue;
         onHealthChanged.Raise();
     }
 
