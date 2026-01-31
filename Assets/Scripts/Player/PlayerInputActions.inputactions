@@ -50,6 +50,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "TestHitMe",
+                    "type": "Button",
+                    "id": "3453f7b6-4cbe-477f-962e-2fd47b144ddd",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -242,7 +251,29 @@
                 },
                 {
                     "name": "",
-                    "id": "d9e28fda-5ff0-4501-9cc4-fe2aa7df7197",
+                    "id": "fdf27fdf-b602-4ffb-a570-86bf2d0ddd1d",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "67fcaa92-d091-46e1-b32e-bc4ea0662d98",
+                    "path": "<Keyboard>/p",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TestHitMe",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "da47ff2e-33dd-4895-b5be-b7b54e456cee",
                     "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
