@@ -66,6 +66,8 @@ public class PlayerMovement : MonoBehaviour
         Cursor.lockState = CursorLockMode.None; // unlock mouse
         Cursor.visible = true; // cursor on
         Debug.Log("Player dead!");
+        Cursor.visible = true;  // cursor on
+        //Time.timeScale = 0; pause? discuss later
 
         this.enabled = false;
     }
