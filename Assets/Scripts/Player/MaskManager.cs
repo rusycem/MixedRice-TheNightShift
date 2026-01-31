@@ -3,76 +3,86 @@ using UnityEngine;
 public class MaskManager : MonoBehaviour
 {
     [Header("Mask Settings")]
-    public float maskDuration = 10f;
-    public float maskCooldown = 5f;
+    public float maxMaskTime = 10f;
+    public float regenSpeed = 2f;
+    public float regenDelay = 1.5f; // wait before regenerating
 
-    [Header("State")]
     public bool isMaskOn { get; private set; }
-    public bool isOnCooldown { get; private set; }
 
-    private float maskTimer = 0f;
-    private float cooldownTimer = 0f;
+    float currentMaskTime;
+    float regenDelayTimer = 0f;
+    int lastSecond = -1;
+
+    private void Start()
+    {
+        currentMaskTime = maxMaskTime;
+    }
 
     private void Update()
     {
-        HandleMaskTimers();
+        UpdateMaskTime();
+        DebugCountdown();
     }
 
-    private void HandleMaskTimers()
+    void UpdateMaskTime()
     {
-        // Active mask countdown
+        // Drain while mask is ON
         if (isMaskOn)
         {
-            maskTimer -= Time.deltaTime;
-            if (maskTimer <= 0f)
+            currentMaskTime -= Time.deltaTime;
+        }
+        else
+        {
+            // Wait before regen
+            if (regenDelayTimer > 0f)
             {
-                DisableMask();
-                Debug.Log("Mask off");
+                regenDelayTimer -= Time.deltaTime;
+            }
+            else
+            {
+                currentMaskTime += regenSpeed * Time.deltaTime;
             }
         }
 
-        // Cooldown countdown
-        if (isOnCooldown)
+        currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
+
+        // Mask runs out
+        if (isMaskOn && currentMaskTime == 0f)
         {
-            cooldownTimer -= Time.deltaTime;
-            if (cooldownTimer <= 0f)
-            {
-                isOnCooldown = false;
-                Debug.Log("Mask cd over");
-            }
+            isMaskOn = false;
+            regenDelayTimer = regenDelay;
+            Debug.Log("Mask 10s ran out — waiting to regen");
         }
     }
 
     public void ToggleMask()
     {
-        if (isOnCooldown)
-        {
-            Debug.Log("Mask still in CD");
+        // Can't turn on if empty
+        if (!isMaskOn && currentMaskTime == 0f)
             return;
-        }
 
-        if (isMaskOn)
-        {
-            DisableMask();
-        }
-        else
-        {
-            EnableMask();
-        }
+        isMaskOn = !isMaskOn;
+
+        if (!isMaskOn)
+            regenDelayTimer = regenDelay; // delay regen after manual off
+
+        Debug.Log(isMaskOn ? "Mask ON" : "Mask OFF — waiting to regen");
     }
 
-    private void EnableMask()
+    // for debug console
+    void DebugCountdown()
     {
-        isMaskOn = true;
-        maskTimer = maskDuration;
-        Debug.Log("Mask ON");
-    }
+        int second = Mathf.CeilToInt(currentMaskTime);
+        if (second == lastSecond) return;
 
-    private void DisableMask()
-    {
-        isMaskOn = false;
-        isOnCooldown = true;
-        cooldownTimer = maskCooldown;
-        Debug.Log("Mask OFF. 5s CD started");
+        lastSecond = second;
+
+        string state =
+            isMaskOn ? "Mask Draining" :
+            regenDelayTimer > 0f ? "Waiting to Regen" :
+            currentMaskTime < maxMaskTime ? "Mask Regenerating" :
+            "Mask Full";
+
+        Debug.Log($"{state}: {second}s");
     }
 }
