@@ -5,13 +5,15 @@ public class MaskManager : MonoBehaviour
     [Header("Mask Settings")]
     public float maxMaskTime = 10f;
     public float regenSpeed = 2f;
-    public float regenDelay = 2f; // regenDelay
+    public float regenDelay = 2f; 
 
     public bool isMaskOn { get; private set; }
 
-    float currentMaskTime;
-    float regenDelayTimer = 0f;
-    int lastSecond = -1;
+    private float currentMaskTime;
+    private float regenDelayTimer = 0f;
+    private int lastSecond = -1;
+    private bool isRegenerating = false;
+    private bool maskEmpty = false; 
 
     private void Start()
     {
@@ -30,37 +32,48 @@ public class MaskManager : MonoBehaviour
         {
             currentMaskTime -= Time.deltaTime;
 
-            // if mask runs out
             if (currentMaskTime <= 0f)
             {
                 currentMaskTime = 0f;
                 isMaskOn = false;
-                regenDelayTimer = regenDelay; 
+                regenDelayTimer = regenDelay;
+                maskEmpty = true; 
+                isRegenerating = false;
                 Debug.Log("Mask ran out, waiting to regen");
             }
         }
         else
         {
-            if (currentMaskTime == 0f && regenDelayTimer > 0f)
+            // Only start regen if mask had emptied
+            if (maskEmpty)
             {
-                regenDelayTimer -= Time.deltaTime;
-            }
-            else if (currentMaskTime == 0f && regenDelayTimer <= 0f)
-            {
-                currentMaskTime += regenSpeed * Time.deltaTime;
-                currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
+                if (regenDelayTimer > 0f)
+                {
+                    regenDelayTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    isRegenerating = true;
+                    currentMaskTime += regenSpeed * Time.deltaTime;
+                    currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
+
+                    if (currentMaskTime >= maxMaskTime)
+                    {
+                        currentMaskTime = maxMaskTime;
+                        isRegenerating = false;
+                        maskEmpty = false; 
+                    }
+                }
             }
         }
     }
 
     public void ToggleMask()
     {
-        // Can't turn on if empty
         if (!isMaskOn && currentMaskTime == 0f)
             return;
 
         isMaskOn = !isMaskOn;
-
         Debug.Log(isMaskOn ? "Mask ON" : "Mask OFF");
     }
 
@@ -73,8 +86,8 @@ public class MaskManager : MonoBehaviour
 
         string state =
             isMaskOn ? "Mask Draining" :
-            (currentMaskTime == 0f && regenDelayTimer > 0f) ? "Waiting to Regen" :
-            (currentMaskTime < maxMaskTime && currentMaskTime > 0f) ? "Mask Regenerating" :
+            (maskEmpty && regenDelayTimer > 0f) ? "Waiting to Regen" :
+            (isRegenerating) ? "Mask Regenerating" :
             "Mask Full";
 
         Debug.Log($"{state}: {second}s");
