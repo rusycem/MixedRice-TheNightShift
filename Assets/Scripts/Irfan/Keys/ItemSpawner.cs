@@ -28,9 +28,9 @@ public class ItemSpawner : MonoBehaviour
 
     void SpawnSingleKey(GameObject prefab)
     {
-        // Try to find a valid point 10 times before giving up
+        // Try to find a valid point 30 times before giving up
         // (Prevents infinite loops if the map is tiny)
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 30; i++)
         {
             if (GetRandomPoint(out Vector3 spawnPoint))
             {
@@ -50,8 +50,8 @@ public class ItemSpawner : MonoBehaviour
         // 2. Ask NavMesh: "Is there valid BLUE ground near this random point?"
         NavMeshHit hit;
 
-        // 2.0f is the search distance. NavMesh.AllAreas checks all walkble surfaces.
-        if (NavMesh.SamplePosition(randomPoint, out hit, 2.0f, NavMesh.AllAreas))
+        // 10.0f is the search distance. NavMesh.AllAreas checks all walkble surfaces.
+        if (NavMesh.SamplePosition(randomPoint, out hit, 10.0f, NavMesh.AllAreas))
         {
             // We found a spot! Adjust Y height so it doesn't clip the floor.
             result = hit.position + Vector3.up * spawnHeightOffset;
@@ -60,5 +60,13 @@ public class ItemSpawner : MonoBehaviour
 
         result = Vector3.zero;
         return false;
+    }
+
+    // Add this to the bottom of ItemSpawner.cs
+    void OnDrawGizmosSelected()
+    {
+        // Draw a Yellow sphere to show the spawn area
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, spawnRadius);
     }
 }
