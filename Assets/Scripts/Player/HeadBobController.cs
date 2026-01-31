@@ -39,7 +39,6 @@ public class HeadBobController : MonoBehaviour
 
         CheckMotion();
         ResetPosition();
-        _camera.LookAt(FocusTarget());
     }
 
     private void CheckMotion()
@@ -78,13 +77,6 @@ public class HeadBobController : MonoBehaviour
 
     private void ResetPosition()
     {
-        _camera.localPosition = Vector3.Lerp(_camera.localPosition, _startPos, 8.0f * Time.deltaTime);
-    }
-
-    private Vector3 FocusTarget()
-    {
-        Vector3 pos = new Vector3(transform.position.x, transform.position.y + _cameraHolder.localPosition.y, transform.position.z);
-        pos += _cameraHolder.forward * 15.0f;
-        return pos;
+        _camera.localPosition = Vector3.Lerp(_camera.localPosition, _startPos, 1.0f * Time.deltaTime);
     }
 }
