@@ -3,6 +3,9 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Mask Settings")]
+    public bool isMaskOn;
+
     [Header("Movement Settings")]
     public CharacterController controller;
     public float walkSpeed = 6f;
@@ -19,6 +22,9 @@ public class PlayerMovement : MonoBehaviour
     [Header("Gravity")]
     public float gravityMultiplier = 2f;
 
+    [Header("Events")]
+    public GameEvent onPlayerDied;
+
     private Vector2 moveInput;
     private Vector2 lookInput;
     private bool isRunning;
@@ -32,17 +38,47 @@ public class PlayerMovement : MonoBehaviour
         ApplyLook();
     }
 
+    private void OnMask(InputValue value)
+    {
+        if (!value.isPressed) return;
+
+        isMaskOn = !isMaskOn;
+
+        if (isMaskOn)
+            isRunning = false;
+
+        Debug.Log("Mask " + (isMaskOn ? "ON" : "OFF"));
+    }
+
+    //testing dead function (irfan)
+    public void OnDie(InputValue value)
+    {
+        if (value.isPressed)
+        {
+            HandleDeath();
+        }
+    }
+
+    public void HandleDeath()
+    {
+        onPlayerDied?.Raise();
+
+        Cursor.lockState = CursorLockMode.None; // unlock mouse
+        Cursor.visible = true; // cursor on
+        Debug.Log("Player dead!");
+
+        this.enabled = false;
+    }
+
     private void HandleMovement()
     {
         if (!controller) return;
 
-        float speed = isRunning ? runSpeed : walkSpeed;
+        float speed = (isRunning && !isMaskOn) ? runSpeed : walkSpeed;
 
-        // Movement direction
         Vector3 move = transform.right * moveInput.x + transform.forward * moveInput.y;
         move.Normalize();
 
-        // Gravity
         if (controller.isGrounded)
             verticalVelocity = -2f;
 
@@ -95,6 +131,16 @@ public class PlayerMovement : MonoBehaviour
     {
         if (disableControl) return;
 
+        if (isMaskOn)
+        {
+            if (value.isPressed) // debug line, can delete these 2 later
+                Debug.Log("Cannot sprint while wearing mask");
+
+            isRunning = false;
+            return;
+        }
+
         isRunning = value.isPressed;
     }
+
 }
