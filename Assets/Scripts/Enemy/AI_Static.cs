@@ -13,6 +13,10 @@ public class AI_Static : MonoBehaviour
     [SerializeField] private float detectionRange = 20f;
     [SerializeField] private float stopDistance = 3f;
 
+    [Header("Mask Stalking")]
+    [SerializeField] private float maskedJumpInterval = 2.5f; // How many seconds between creeps when player is masked
+    private float maskedTimer = 0f;
+
     [Header("Rotation")]
     [SerializeField] private float rotationSpeed = 50f;
 
@@ -21,6 +25,7 @@ public class AI_Static : MonoBehaviour
     [SerializeField] private float killRange = 2f;
 
     private bool wasWatchedLastFrame = true;
+    private MaskManager playerMask;
 
     void Start()
     {
@@ -34,6 +39,11 @@ public class AI_Static : MonoBehaviour
             playerCamera = Camera.main;
         }
 
+        if (playerTransform != null)
+        {
+            playerMask = playerTransform.GetComponent<MaskManager>();
+        }
+
         agent.updateRotation = false;
     }
 
@@ -43,7 +53,9 @@ public class AI_Static : MonoBehaviour
 
         float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
 
-        if (distanceToPlayer <= killRange)
+        bool isPlayerMasked = playerMask != null && playerMask.isMaskOn;
+
+        if (distanceToPlayer <= killRange && !isPlayerMasked)
         {
             CheckForKill();
             return;
@@ -54,17 +66,33 @@ public class AI_Static : MonoBehaviour
             FacePlayer();
         }
 
-        bool currentlyWatched = IsBeingWatched();
+        bool physicallyWatched = IsBeingWatched();
 
         if (distanceToPlayer < detectionRange)
         {
-            if (!currentlyWatched && wasWatchedLastFrame)
+            // Player is NOT wearing the mask
+            if (!isPlayerMasked)
             {
-                PerformInstantJump(distanceToPlayer);
+                maskedTimer = 0f;
+
+                if (!physicallyWatched && wasWatchedLastFrame)
+                {
+                    PerformInstantJump(distanceToPlayer);
+                }
+            }
+            // Player IS wearing the mask
+            else
+            {
+                maskedTimer += Time.deltaTime;
+                if (maskedTimer >= maskedJumpInterval)
+                {
+                    PerformInstantJump(distanceToPlayer);
+                    maskedTimer = 0f;
+                }
             }
         }
 
-        wasWatchedLastFrame = currentlyWatched;
+        wasWatchedLastFrame = physicallyWatched;
     }
 
     void CheckForKill()
@@ -121,4 +149,6 @@ public class AI_Static : MonoBehaviour
         }
         return false;
     }
+
+    
 }

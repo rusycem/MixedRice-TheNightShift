@@ -123,10 +123,12 @@ public class PlayerMovement : MonoBehaviour
 
         transform.Rotate(Vector3.up * yaw);
 
-        cameraPitch -= pitch;
-        cameraPitch = Mathf.Clamp(cameraPitch, minPitch, maxPitch);
+        cameraPitch = Mathf.Clamp(cameraPitch - pitch, minPitch, maxPitch);
+        cameraTarget.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
+        //cameraPitch -= pitch;
+        //cameraPitch = Mathf.Clamp(cameraPitch, minPitch, maxPitch);
 
-        cameraTarget.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
+        //cameraTarget.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
     }
 
     private void OnMove(InputValue value)

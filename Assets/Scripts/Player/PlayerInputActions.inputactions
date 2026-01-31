@@ -44,8 +44,9 @@
                 },
                 {
                     "name": "Pause",
+                    "name": "Mask",
                     "type": "Button",
-                    "id": "ec4ca8df-33b6-46f1-9d7f-859bdcfab282",
+                    "id": "936776dc-c449-4c55-8937-87d54cc969be",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -283,6 +284,7 @@
                 {
                     "name": "",
                     "id": "efa96c89-b244-4de3-9b98-4490975a7a4d",
+                    "id": "da47ff2e-33dd-4895-b5be-b7b54e456cee",
                     "path": "<Keyboard>/space",
                     "interactions": "",
                     "processors": "",
