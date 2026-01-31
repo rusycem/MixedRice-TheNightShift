@@ -10,9 +10,8 @@ public class MaskManager : MonoBehaviour
 
     [Header("Animation")]
     public Animator maskAnimator;
-    public GameObject maskVisual; // <-- Drag mask model here
-    public float animationDuration = 0.5f; // match animation length
-
+    public GameObject maskVisual; 
+    public float animationDuration = 0.5f; 
     public bool isMaskOn { get; private set; }
 
     private float currentMaskTime;
@@ -23,9 +22,7 @@ public class MaskManager : MonoBehaviour
     private void Start()
     {
         currentMaskTime = maxMaskTime;
-
-        // Hide mask at start
-        if (maskVisual != null)
+        if (maskVisual != null) //hide mask
             maskVisual.SetActive(false);
     }
 
@@ -48,7 +45,6 @@ public class MaskManager : MonoBehaviour
 
         if (!isMaskOn)
         {
-            // SHOW mask before ON animation
             if (maskVisual != null)
                 maskVisual.SetActive(true);
 
@@ -57,17 +53,14 @@ public class MaskManager : MonoBehaviour
         }
         else
         {
-            // Play OFF animation first
             maskAnimator.SetTrigger("OffMask");
             isMaskOn = false;
         }
 
         Debug.Log(isMaskOn ? "Mask ON" : "Mask OFF");
 
-        // Wait until animation finishes
-        yield return new WaitForSeconds(animationDuration);
+        yield return new WaitForSeconds(animationDuration); //wait for anim
 
-        // Hide mask AFTER OFF animation finishes
         if (!isMaskOn && maskVisual != null)
             maskVisual.SetActive(false);
 
@@ -88,7 +81,6 @@ public class MaskManager : MonoBehaviour
                 maskEmpty = true;
                 Debug.Log("Mask ran out, waiting to regen");
 
-                // Hide mask when forced off
                 if (maskVisual != null)
                     maskVisual.SetActive(false);
             }
