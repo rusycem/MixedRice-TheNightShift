@@ -12,6 +12,6 @@ public class MinimapFollow : MonoBehaviour
         transform.position = newPosition;
 
         // always face north
-        transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+        //transform.rotation = Quaternion.Euler(90f, 0f, 0f);
     }
 }
