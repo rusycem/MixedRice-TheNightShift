@@ -240,6 +240,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+--- !u!114 &1037350996 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5900852012179647711, guid: f140d71ebe1f11e47866d0c5fc78d0bf, type: 3}
+  m_PrefabInstance: {fileID: 8782460989033545205}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8758204f213f7114a826867c954efec6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
 --- !u!114 &1230288482 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 98617758557337431, guid: a982e8ac70940bc40b77af76ffb56365, type: 3}
@@ -513,6 +524,18 @@ PrefabInstance:
     - target: {fileID: 1589062672408816108, guid: a982e8ac70940bc40b77af76ffb56365, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3313838469388449466, guid: a982e8ac70940bc40b77af76ffb56365, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3313838469388449466, guid: a982e8ac70940bc40b77af76ffb56365, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1037350996}
+    - target: {fileID: 3313838469388449466, guid: a982e8ac70940bc40b77af76ffb56365, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ResumePlay
       objectReference: {fileID: 0}
     - target: {fileID: 4596304002655032336, guid: a982e8ac70940bc40b77af76ffb56365, type: 3}
       propertyPath: m_AnchorMax.y
