@@ -20,12 +20,12 @@ public class PlayerMovement : MonoBehaviour
     [Header("Events")]
     public GameEvent onPlayerDied;
     public GameEvent onTogglePause;
- 
+
     [Header("Stamina Settings")]
-    public float maxStamina = 5f;
-    public float staminaDrainRate = 1f;
-    public float staminaRegenRate = 0.5f;
-    public bool showDebugStamina = true;
+    public float maxStamina = 5f;          
+    public float staminaDrainRate = 1f;  
+    public float staminaRegenRate = 0.5f; 
+    public bool showDebugStamina = true;   
 
     [Header("Other")]
     public float gravityMultiplier = 2f;
@@ -65,12 +65,16 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+
+
+
     private void Update()
     {
         HandleMovement();
         ApplyLook();
         HandleStamina();
     }
+
     private void HandleStamina()
     {
         if (isRunning && moveInput.magnitude > 0 && !maskManager.isMaskOn)
@@ -94,6 +98,7 @@ public class PlayerMovement : MonoBehaviour
         if (staminaSlider != null)
             staminaSlider.value = currentStamina;
     }
+
     private void HandleMovement()
     {
         if (!controller) return;
@@ -111,6 +116,7 @@ public class PlayerMovement : MonoBehaviour
         Vector3 velocity = move * speed + Vector3.up * verticalVelocity;
         controller.Move(velocity * Time.deltaTime);
     }
+
     private void ApplyLook()
     {
         if (!cameraTarget) return;
@@ -123,13 +129,12 @@ public class PlayerMovement : MonoBehaviour
 
         transform.Rotate(Vector3.up * yaw);
 
-        cameraPitch = Mathf.Clamp(cameraPitch - pitch, minPitch, maxPitch);
-        cameraTarget.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
-        //cameraPitch -= pitch;
-        //cameraPitch = Mathf.Clamp(cameraPitch, minPitch, maxPitch);
+        cameraPitch -= pitch;
+        cameraPitch = Mathf.Clamp(cameraPitch, minPitch, maxPitch);
 
-        //cameraTarget.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
+        cameraTarget.localEulerAngles = new Vector3(cameraPitch, 0f, 0f);
     }
+
 
     private void OnMove(InputValue value)
     {
@@ -191,23 +196,20 @@ public class PlayerMovement : MonoBehaviour
     {
         isPaused = !isPaused;
 
-        // Use a ternary or simple if/else to ensure these ALWAYS fire together
-        Time.timeScale = isPaused ? 0f : 1f;
-        Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked;
-        Cursor.visible = isPaused;
-
-        // This notifies your PauseMenuController
-        onTogglePause?.Raise();
-    }
-
-    public void ResumePlay()
-    {
         if (isPaused)
         {
-            TogglePause();
-            Debug.Log("Pressed");
-
+            Time.timeScale = 0f;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
+        else
+        {
+            Time.timeScale = 1f;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+
+        onTogglePause?.Raise();
     }
 
     public void OnDie(InputValue value)
