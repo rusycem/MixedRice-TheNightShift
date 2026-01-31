@@ -1,10 +1,10 @@
 using UnityEngine;
-using UnityEngine.UI; // 1. ADDED: Required for UI
+using UnityEngine.UI; 
 
 public class MaskManager : MonoBehaviour
 {
     [Header("UI Settings")]
-    public Image maskFillImage; // 2. ADDED: Drag your Radial Image here
+    public Image maskFillImage; 
 
     [Header("Mask Settings")]
     public float maxMaskTime = 10f;
@@ -27,16 +27,15 @@ public class MaskManager : MonoBehaviour
     private void Update()
     {
         UpdateMaskTime();
-        UpdateUI(); // 3. ADDED: Update the visual bar every frame
+        UpdateUI(); 
         DebugCountdown();
     }
 
-    // 4. ADDED: The UI Logic
+
     void UpdateUI()
     {
         if (maskFillImage != null)
         {
-            // Calculates the percentage (0.0 to 1.0)
             maskFillImage.fillAmount = currentMaskTime / maxMaskTime;
         }
     }
@@ -59,7 +58,6 @@ public class MaskManager : MonoBehaviour
         }
         else
         {
-            // Only start regen if mask had emptied
             if (maskEmpty)
             {
                 if (regenDelayTimer > 0f)
