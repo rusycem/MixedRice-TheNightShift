@@ -7,7 +7,7 @@ public class AI_Chaser : MonoBehaviour
     [Header("Components")]
     [SerializeField] private NavMeshAgent agent;
     [SerializeField] private Transform playerTarget;
-    //[SerializeField] private Animator anim;
+    [SerializeField] private Animator anim;
 
     [Header("Patrol Settings")]
     [SerializeField] private Transform[] patrolPoints;
@@ -32,10 +32,10 @@ public class AI_Chaser : MonoBehaviour
             agent = GetComponent<NavMeshAgent>();
         }
         
-        // if (anim == null)
-        // {
-        //     anim = GetComponent<Animator>();
-        // }
+        if (anim == null)
+        {
+            anim = GetComponent<Animator>();
+        }
 
         if (playerTarget != null)
         {
@@ -81,12 +81,12 @@ public class AI_Chaser : MonoBehaviour
         agent.speed = 6f;
         agent.destination = playerTarget.position;
 
-        // if (!anim.GetBool("isChasing"))
-        // {
-        //     anim.SetBool("isIdle", false);
-        //     anim.SetBool("isWalking", false);
-        //     anim.SetBool("isChasing", true);
-        // }
+        if (!anim.GetBool("isChasing"))
+        {
+            anim.SetBool("isIdle", false);
+            anim.SetBool("isWalking", false);
+            anim.SetBool("isChasing", true);
+        }
     }
 
     void Patrol()
@@ -107,9 +107,9 @@ public class AI_Chaser : MonoBehaviour
         agent.isStopped = true;
         agent.velocity = Vector3.zero; // Stop instant slide
 
-        // anim.SetBool("isWalking", false);
-        // anim.SetBool("isChasing", false);
-        // anim.SetBool("isIdle", true);
+        anim.SetBool("isWalking", false);
+        anim.SetBool("isChasing", false);
+        anim.SetBool("isIdle", true);
 
         Debug.Log("Enemy lost player, searching...");
         yield return new WaitForSeconds(lostPlayerIdleTime);
@@ -124,9 +124,9 @@ public class AI_Chaser : MonoBehaviour
         isWaiting = true;
         agent.isStopped = true;
 
-        // anim.SetBool("isWalking", false);
-        // anim.SetBool("isChasing", false);
-        // anim.SetBool("isIdle", true);
+        anim.SetBool("isWalking", false);
+        anim.SetBool("isChasing", false);
+        anim.SetBool("isIdle", true);
 
         yield return new WaitForSeconds(idleWaitTime);
 
@@ -155,9 +155,9 @@ public class AI_Chaser : MonoBehaviour
         agent.isStopped = false; 
         agent.destination = patrolPoints[currentPointIndex].position;
 
-        // anim.SetBool("isIdle", false);
-        // anim.SetBool("isChasing", false);
-        // anim.SetBool("isWalking", true);
+        anim.SetBool("isIdle", false);
+        anim.SetBool("isChasing", false);
+        anim.SetBool("isWalking", true);
     }
 
     private void OnTriggerEnter(Collider other)
