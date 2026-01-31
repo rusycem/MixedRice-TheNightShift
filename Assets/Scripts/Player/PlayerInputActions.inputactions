@@ -43,12 +43,27 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Mask",
-                    "type": "Button",
-                    "id": "936776dc-c449-4c55-8937-87d54cc969be",
                     "name": "Pause",
                     "type": "Button",
                     "id": "ec4ca8df-33b6-46f1-9d7f-859bdcfab282",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "TestHitMe",
+                    "type": "Button",
+                    "id": "3453f7b6-4cbe-477f-962e-2fd47b144ddd",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Mask",
+                    "type": "Button",
+                    "id": "3d4c432e-26e9-4846-aaef-aa7071f074fe",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -245,18 +260,34 @@
                 },
                 {
                     "name": "",
-                    "id": "d9e28fda-5ff0-4501-9cc4-fe2aa7df7197",
-                    "path": "<Keyboard>/space",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Mask",
                     "id": "fdf27fdf-b602-4ffb-a570-86bf2d0ddd1d",
                     "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "67fcaa92-d091-46e1-b32e-bc4ea0662d98",
+                    "path": "<Keyboard>/p",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TestHitMe",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "efa96c89-b244-4de3-9b98-4490975a7a4d",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Mask",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -196,20 +196,21 @@ public class PlayerMovement : MonoBehaviour
     {
         isPaused = !isPaused;
 
+        // Use a ternary or simple if/else to ensure these ALWAYS fire together
+        Time.timeScale = isPaused ? 0f : 1f;
+        Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.visible = isPaused;
+
+        // This notifies your PauseMenuController
+        onTogglePause?.Raise();
+    }
+
+    public void ResumePlay()
+    {
         if (isPaused)
         {
-            Time.timeScale = 0f;
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            TogglePause();
         }
-        else
-        {
-            Time.timeScale = 1f;
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-        }
-
-        onTogglePause?.Raise();
     }
 
     public void OnDie(InputValue value)
