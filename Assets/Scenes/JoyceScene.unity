@@ -370,9 +370,10 @@ GameObject:
   - component: {fileID: 812585962}
   - component: {fileID: 812585961}
   - component: {fileID: 812585960}
-  - component: {fileID: 812585959}
   - component: {fileID: 812585965}
+  - component: {fileID: 812585959}
   - component: {fileID: 812585966}
+  - component: {fileID: 812585967}
   m_Layer: 0
   m_Name: PlayerCapsule
   m_TagString: Untagged
@@ -401,8 +402,9 @@ MonoBehaviour:
   minPitch: -80
   maxPitch: 80
   invertY: 0
+  onPlayerDied: {fileID: 11400000, guid: b9b77f953e0af474bbbe6ca4043759bd, type: 2}
   gravityMultiplier: 2
-  onPlayerDied: {fileID: 0}
+  maskManager: {fileID: 812585967}
 --- !u!143 &812585960
 CharacterController:
   m_ObjectHideFlags: 0
@@ -573,9 +575,23 @@ MonoBehaviour:
   _idleAmp: 0.005
   _idleFreq: 1.5
   _walkAmp: 0.007
-  _walkFreq: 12
+  _walkFreq: 10
   _runAmp: 0.02
   _runFreq: 16
+--- !u!114 &812585967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 812585958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c59bb784595e71c478c38eaedb44b0af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MaskManager
+  maskDuration: 10
+  maskCooldown: 5
 --- !u!1 &919554827
 GameObject:
   m_ObjectHideFlags: 0
