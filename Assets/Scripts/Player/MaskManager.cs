@@ -98,6 +98,17 @@ public class MaskManager : MonoBehaviour
                 maskEmpty = true;
                 regenDelayTimer = regenDelay;
                 Debug.Log("Mask ran out!");
+
+                // Turn off mask & trigger OFF animation
+                isMaskOn = false;
+                regenDelayTimer = regenDelay;
+                maskEmpty = true;
+                isRegenerating = false;
+
+                Debug.Log("Mask ran out, playing OFF animation");
+
+                if (!isAnimating)
+                    StartCoroutine(AutoMaskOff());
             }
         }
         else
@@ -121,5 +132,36 @@ public class MaskManager : MonoBehaviour
                 }
             }
         }
+            if (regenDelayTimer > 0f)
+            {
+                regenDelayTimer -= Time.deltaTime;
+            }
+            else
+            {
+                currentMaskTime += regenSpeed * Time.deltaTime;
+                currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
+
+                if (currentMaskTime >= maxMaskTime)
+                {
+                    currentMaskTime = maxMaskTime;
+                    maskEmpty = false;
+                    isRegenerating = false;
+                }
+            }
+        }
+    }
+
+    IEnumerator AutoMaskOff()
+    {
+        isAnimating = true;
+
+        maskAnimator.SetTrigger("OffMask");
+
+        yield return new WaitForSeconds(animationDuration);
+
+        if (maskVisual != null)
+            maskVisual.SetActive(false);
+
+        isAnimating = false;
     }
 }

@@ -531,6 +531,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &338424939 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7720880939313002387, guid: 886d8d10d29b4074ba7828d8c86e2f56, type: 3}
+  m_PrefabInstance: {fileID: 4780227511670381938}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
 --- !u!1 &750336226
 GameObject:
   m_ObjectHideFlags: 0
@@ -1452,7 +1463,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c59bb784595e71c478c38eaedb44b0af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MaskManager
-  maskFillImage: {fileID: 0}
+  maskFillImage: {fileID: 338424939}
   maxMaskTime: 8
   regenSpeed: 2
   regenDelay: 2
@@ -1686,6 +1697,32 @@ MonoBehaviour:
   gravityMultiplier: 2
   maskManager: {fileID: 4380997477916209377}
   staminaSlider: {fileID: 4297899500433915827}
+  footstepClips:
+  - {fileID: 8300000, guid: 3bc58ac383628194098f3c04bd5bc2ff, type: 3}
+  - {fileID: 8300000, guid: 3e738570fcb1a8f478fc0d8eef1a44c3, type: 3}
+  - {fileID: 8300000, guid: b0991c10df35891478457e1e7fc1cbbf, type: 3}
+  - {fileID: 8300000, guid: 30ea316974c5e6342a96c5788e405682, type: 3}
+  - {fileID: 8300000, guid: a9fa953b12319654489ce93bed76b155, type: 3}
+  - {fileID: 8300000, guid: fa0347191fed48940b313133c52b18a9, type: 3}
+  - {fileID: 8300000, guid: 710c6754399f9804ebe3b4ec9148c101, type: 3}
+  - {fileID: 8300000, guid: 25d04eeb326173f4897dab3fad603ef1, type: 3}
+  - {fileID: 8300000, guid: 58bb7e51f5b40f749b5e457c12a3cd9a, type: 3}
+  - {fileID: 8300000, guid: 9a11076cebf6f4c429f53f6059fc4cbf, type: 3}
+  - {fileID: 8300000, guid: c8ad7fd564475094c90338f0c26c3176, type: 3}
+  - {fileID: 8300000, guid: 4dba665275135dd419a571bbf6d19b66, type: 3}
+  - {fileID: 8300000, guid: 4e999b954a14aae4886c5265ef8db9a6, type: 3}
+  - {fileID: 8300000, guid: 34376698775a51c4ca38ad99c9b80757, type: 3}
+  - {fileID: 8300000, guid: 66bfbf161c74db244a0ee2829182a9b0, type: 3}
+  - {fileID: 8300000, guid: 6767afa724c14554f83007bace0011a2, type: 3}
+  - {fileID: 8300000, guid: a442f5e5ce74bbb41852f97afbcaf68f, type: 3}
+  - {fileID: 8300000, guid: 563891024a68e344c9f4065244b3ae63, type: 3}
+  - {fileID: 8300000, guid: 95a1ff0daa04f6b4da066f777bb8e464, type: 3}
+  - {fileID: 8300000, guid: f3dfbcf24614a97449a7e8d90bf6f747, type: 3}
+  - {fileID: 8300000, guid: 2e31b366967f87f478882cb884c9d54c, type: 3}
+  walkStepInterval: 0.5
+  runStepInterval: 0.3
+  minPitchStep: 0.9
+  maxPitchStep: 1.1
 --- !u!143 &7425843638883627179
 CharacterController:
   m_ObjectHideFlags: 0
