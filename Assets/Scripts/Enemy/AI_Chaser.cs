@@ -16,6 +16,11 @@ public class AI_Chaser : MonoBehaviour
     [SerializeField] private Transform playerTarget;
     [SerializeField] private Animator anim;
 
+    [Header("Jumpscare Settings")]
+    public GameObject jumpscarePanel; // Drag your UI Panel with the scary face here
+    public AudioSource jumpscareAudio; // Drag an AudioSource with the scream sound
+    public float recoveryTime = 2.0f; // How long before AI chases again
+
     [Header("Patrol Settings")]
     [SerializeField] private Transform[] patrolPoints;
     [SerializeField] private float idleWaitTime = 3f;
@@ -23,6 +28,7 @@ public class AI_Chaser : MonoBehaviour
 
     private bool isWaiting = false;
     private int currentPointIndex = -1;
+    private bool isAttacking = false; // Prevents rapid-fire hits
 
     [Header("AI Settings")]
     [SerializeField] private float detectionRange = 10f;
@@ -152,14 +158,79 @@ public class AI_Chaser : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log($"AI touched object named: {other.name}");
+        if (isAttacking) return; // Don't attack if already in the middle of a jumpscare
+
         if (other.CompareTag("Player"))
         {
-            bool playerIsMasked = playerMask != null && playerMask.isMaskOn;
+            PlayerHealth healthScript = other.GetComponent<PlayerHealth>();
 
-            if (!playerIsMasked && onPlayerDied != null)
+            if (healthScript != null)
             {
-                onPlayerDied.Raise();
+                // 1. Deal Damage (Logic handled in PlayerHealth.cs)
+                healthScript.TakeDamage(1);
+
+                // 2. Trigger the Sequence
+                StartCoroutine(JumpscareSequence());
             }
         }
+    }
+
+    IEnumerator JumpscareSequence()
+    {
+        isAttacking = true;
+
+        // STOP the AI immediately
+        agent.isStopped = true;
+        agent.velocity = Vector3.zero;
+        SetState(EnemyState.Idle);
+
+        // --- VISUALS ---
+        if (jumpscarePanel) jumpscarePanel.SetActive(true);
+        if (jumpscareAudio) jumpscareAudio.Play();
+
+        // Wait for the scare to finish (e.g., 2 seconds)
+        yield return new WaitForSeconds(recoveryTime);
+
+        if (jumpscarePanel) jumpscarePanel.SetActive(false);
+
+        // OPTION 1: TELEPORT AWAY (Give player breathing room)
+        // ==========
+        TeleportToSafeSpot();
+
+        // OPTION 2: FREEZE IN PLACE (Uncomment to use this instead)
+        // ===============
+        // // Just wait a bit longer while player runs, then resume
+        // yield return new WaitForSeconds(3.0f); 
+        // isAttacking = false;
+        // agent.isStopped = false;
+        // =======
+    }
+
+    void TeleportToSafeSpot()
+    {
+        // 1. Pick a random safe spot from your existing Patrol Points
+        if (patrolPoints.Length > 0)
+        {
+            int randomIndex = Random.Range(0, patrolPoints.Length);
+
+            // Warp moves the agent instantly without confusing the pathfinder
+            agent.Warp(patrolPoints[randomIndex].position);
+        }
+        else
+        {
+            // Fallback: If no patrol points exist, send it back to (0,0,0) or keep it here
+            Debug.LogWarning("No Patrol Points found! AI warped to zero.");
+            agent.Warp(Vector3.zero);
+        }
+
+        // 2. Reset the AI Brain
+        isAttacking = false;   // Allow it to attack again later
+        isWaiting = false;     // Stop any waiting coroutines
+        agent.isStopped = false; // Force movement to restart
+
+        // 3. Immediately start patrolling from this new spot
+        SetState(EnemyState.Walk);
+        GoToNextPatrolPoint();
     }
 }
