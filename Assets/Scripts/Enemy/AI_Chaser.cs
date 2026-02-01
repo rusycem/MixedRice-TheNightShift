@@ -4,12 +4,7 @@ using System.Collections;
 
 public class AI_Chaser : MonoBehaviour
 {
-    public enum EnemyState
-    {
-        Idle = 0,
-        Walk = 1,
-        Chase = 2
-    }
+    public enum EnemyState { Idle = 0, Walk = 1, Chase = 2 }
 
     [Header("Components")]
     [SerializeField] private NavMeshAgent agent;
@@ -17,23 +12,31 @@ public class AI_Chaser : MonoBehaviour
     [SerializeField] private Animator anim;
 
     [Header("Detection Settings")]
-    public bool useRadiusDetection = true; // "Hearing" (360 detection through walls?)
-    public float detectionRadius = 10f;
+    public bool useRadiusDetection = true;
+    public float detectionRadius = 10f; // USED FOR HEARING
 
-    public bool useConeVision = true;      // "Sight" (Limited angle, blocked by walls)
-    public float visionRadius = 15f;       // How far it can see
-    [Range(0, 360)] public float viewAngle = 90f; // The width of the cone
-    public LayerMask obstacleMask;         // What blocks vision (Walls, etc.)
+    public bool useConeVision = true;
+    public float visionRadius = 15f;    // USED FOR SIGHT
+    [Range(0, 360)] public float viewAngle = 90f;
+    public LayerMask obstacleMask;
 
-    [Header("Footsteps (Placeholder)")]
+    [Header("Detection Alert")]
+    public AudioSource alertAudio;
+    public GameObject alertUI;
+    public float alertDuration = 2f;
+    public float chaseStartDelay = 1.0f; // Time to wait before running
+    public float chaseSpeed = 4.0f;      // Slower than before (was 6)
+
+    [Header("Footsteps")]
     public AudioSource footstepSource;
-    public float footstepInterval = 0.5f; // Time between steps
+    public float footstepInterval = 0.5f;
     private float nextStepTime;
 
     [Header("Jumpscare Settings")]
-    public GameObject jumpscarePanel; // Drag your UI Panel with the scary face here
-    public AudioSource jumpscareAudio; // Drag an AudioSource with the scream sound
-    public float recoveryTime = 2.0f; // How long before AI chases again
+    public GameObject jumpscarePanel;
+    public AudioSource jumpscareAudio;
+    [Tooltip("How long the AI screams in your face before teleporting away")]
+    public float jumpscareDuration = 2.0f; // Renamed from recoveryTime for clarity
 
     [Header("Patrol Settings")]
     [SerializeField] private Transform[] patrolPoints;
@@ -42,26 +45,41 @@ public class AI_Chaser : MonoBehaviour
 
     private bool isWaiting = false;
     private int currentPointIndex = -1;
-    private bool isAttacking = false; // Prevents rapid-fire hits
+    private bool isAttacking = false;
 
-    // Mask Manager Reference
     private MaskManager playerMask;
+    private bool hasAlerted = false;
 
-    [Header("AI Settings")]
-    [SerializeField] private float detectionRange = 10f;
-    private bool isChasing = false;
-
-    [Header("Events")]
+    // Events
     public GameEvent onPlayerDied;
 
     void Start()
     {
         if (!agent) agent = GetComponent<NavMeshAgent>();
         if (!anim) anim = GetComponent<Animator>();
-        if (playerTarget) playerMask = playerTarget.GetComponent<MaskManager>();
+        if (playerTarget) playerMask = playerTarget.GetComponentInParent<MaskManager>();
 
-        // Auto-configure obstacle mask if forgotten (assumes Default layer contains walls)
         if (obstacleMask == 0) obstacleMask = LayerMask.GetMask("Default");
+
+        // --- FIX: FORCE 3D SOUND SETTINGS ---
+        if (alertAudio) alertAudio.spatialBlend = 1.0f;     // 1.0 = Fully 3D
+        if (footstepSource) footstepSource.spatialBlend = 1.0f;
+
+        // --- FIX: SAFETY INITIALIZATION ---
+        // 1. Prevent animation from overriding movement
+        if (anim) anim.applyRootMotion = false;
+
+        // 2. Snap to NavMesh immediately to prevent "Missing Mesh" / Sinking
+        // This looks 5 units down/up to find the floor and snaps the agent there.
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(transform.position, out hit, 5.0f, NavMesh.AllAreas))
+        {
+            agent.Warp(hit.position);
+        }
+        else
+        {
+            Debug.LogError($"AI {name} is NOT placed on or near a NavMesh! It will not move.");
+        }
 
         GoToNextPatrolPoint();
     }
@@ -70,50 +88,51 @@ public class AI_Chaser : MonoBehaviour
     {
         HandleFootsteps();
 
-        if (!playerTarget || isAttacking) return;
+        // If attacking, freeze logic.
+        if (isAttacking) return;
 
-        // --- NEW DETECTION LOGIC ---
         bool playerDetected = false;
 
-        // 1. Check Mask (If mask is ON, AI is blind/deaf to player)
-        bool isMaskSafe = (playerMask != null && playerMask.isMaskOn);
-
-        if (!isMaskSafe)
+        // Only run detection if we actually have a target
+        if (playerTarget != null)
         {
-            // Check Hearing (Radius)
-            if (useRadiusDetection && CheckHearing())
+            bool isMaskSafe = (playerMask != null && playerMask.isMaskOn);
+
+            if (!isMaskSafe)
             {
-                playerDetected = true;
-            }
-            // Check Sight (Cone)
-            else if (useConeVision && CheckSight())
-            {
-                playerDetected = true;
+                if (useRadiusDetection && CheckHearing()) playerDetected = true;
+                else if (useConeVision && CheckSight()) playerDetected = true;
             }
         }
 
-        // --- STATE MACHINE ---
         if (playerDetected)
         {
             if (!isAttacking)
             {
-                StopAllCoroutines();
-                isWaiting = false;
-                ChasePlayer();
+                // Only start the chase routine if we aren't already alerted/chasing
+                if (!hasAlerted)
+                {
+                    StopAllCoroutines();
+                    isWaiting = false;
+                    StartCoroutine(ChasePlayerRoutine());
+                }
+                else
+                {
+                    // Already chasing, just update destination
+                    agent.destination = playerTarget.position;
+                }
             }
         }
         else
         {
-            // Player lost or hidden
+            // --- FIX: Patrol runs even if playerTarget is null or hidden ---
             Patrol();
         }
     }
 
-    //sensory
-
+    // ================= SENSORY LOGIC =================
     bool CheckHearing()
     {
-        // Simple distance check (can hear through walls usually)
         return Vector3.Distance(transform.position, playerTarget.position) < detectionRadius;
     }
 
@@ -122,90 +141,71 @@ public class AI_Chaser : MonoBehaviour
         Vector3 dirToPlayer = (playerTarget.position - transform.position).normalized;
         float distToPlayer = Vector3.Distance(transform.position, playerTarget.position);
 
-        // 1. Distance Check
         if (distToPlayer > visionRadius) return false;
 
-        // 2. Angle Check (The Cone)
         if (Vector3.Angle(transform.forward, dirToPlayer) < viewAngle / 2)
         {
-            // 3. Wall Check (Raycast)
-            // We cast from our eyes (up 1.6m) to player's center (up 1m) to avoid floor clipping
             Vector3 eyePos = transform.position + Vector3.up * 1.6f;
             Vector3 targetPos = playerTarget.position + Vector3.up * 1.0f;
 
-            if (!Physics.Linecast(eyePos, targetPos, obstacleMask))
-            {
-                return true; // Clear line of sight!
-            }
+            if (!Physics.Linecast(eyePos, targetPos, obstacleMask)) return true;
         }
         return false;
     }
 
     void HandleFootsteps()
     {
-        // If moving faster than 0.1 velocity
         if (agent.velocity.magnitude > 0.1f && !isWaiting && !isAttacking)
         {
             if (Time.time >= nextStepTime)
             {
-                // PLAY SOUND HERE
                 if (footstepSource) footstepSource.Play();
-
-                // Debug log to prove it works
-                // Debug.Log("Footstep!"); 
-
                 nextStepTime = Time.time + footstepInterval;
             }
         }
     }
 
-    //debug vision
-    void OnDrawGizmosSelected()
+    // ================= MOVEMENT LOGIC =================
+    IEnumerator ChasePlayerRoutine()
     {
-        // Draw Hearing Radius (Red)
-        if (useRadiusDetection)
+        hasAlerted = true;
+
+        // 1. Trigger Alert Visuals/Audio
+        if (alertAudio) alertAudio.Play();
+        if (alertUI)
         {
-            Gizmos.color = new Color(1, 0, 0, 0.3f);
-            Gizmos.DrawWireSphere(transform.position, detectionRadius);
+            alertUI.SetActive(true);
+            StartCoroutine(HideAlertUI());
         }
 
-        // Draw Vision Cone (Yellow)
-        if (useConeVision)
-        {
-            Gizmos.color = Color.yellow;
-            Vector3 viewAngleA = DirFromAngle(-viewAngle / 2, false);
-            Vector3 viewAngleB = DirFromAngle(viewAngle / 2, false);
+        // 2. Hesitate! (Give player time to react)
+        agent.isStopped = true;
+        SetState(EnemyState.Idle);
 
-            Gizmos.DrawLine(transform.position, transform.position + viewAngleA * visionRadius);
-            Gizmos.DrawLine(transform.position, transform.position + viewAngleB * visionRadius);
+        yield return new WaitForSeconds(chaseStartDelay);
 
-            // Draw arc (simple line for visualization)
-            Gizmos.DrawLine(transform.position + viewAngleA * visionRadius, transform.position + viewAngleB * visionRadius);
-        }
-    }
-
-    public Vector3 DirFromAngle(float angleInDegrees, bool angleIsGlobal)
-    {
-        if (!angleIsGlobal) angleInDegrees += transform.eulerAngles.y;
-        return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
-    }
-
-    void SetState(EnemyState state)
-    {
-        anim.SetInteger("AnimState", (int)state);
-    }
-
-    void ChasePlayer()
-    {
+        // 3. Start Running
         agent.isStopped = false;
-        agent.speed = 6f;
+        agent.speed = chaseSpeed;
         agent.destination = playerTarget.position;
-
         SetState(EnemyState.Chase);
+    }
+
+    IEnumerator HideAlertUI()
+    {
+        yield return new WaitForSeconds(alertDuration);
+        if (alertUI) alertUI.SetActive(false);
     }
 
     void Patrol()
     {
+        // --- FIX: Force UI off immediately if we lost the player ---
+        if (hasAlerted)
+        {
+            hasAlerted = false;
+            if (alertUI) alertUI.SetActive(false); // Immediate cleanup
+        }
+
         if (isWaiting) return;
 
         if (!agent.pathPending && agent.remainingDistance < 0.5f)
@@ -223,27 +223,9 @@ public class AI_Chaser : MonoBehaviour
         isWaiting = true;
         agent.isStopped = true;
         agent.velocity = Vector3.zero;
-
         SetState(EnemyState.Idle);
-
         yield return new WaitForSeconds(idleWaitTime);
-
         isWaiting = false;
-        GoToNextPatrolPoint();
-    }
-
-    IEnumerator LostPlayerDelay()
-    {
-        isWaiting = true;
-        agent.isStopped = true;
-        agent.velocity = Vector3.zero;
-
-        SetState(EnemyState.Idle);
-
-        yield return new WaitForSeconds(lostPlayerIdleTime);
-
-        isWaiting = false;
-        agent.speed = 3f;
         GoToNextPatrolPoint();
     }
 
@@ -251,40 +233,39 @@ public class AI_Chaser : MonoBehaviour
     {
         if (patrolPoints.Length == 0) return;
 
-        int newIndex = currentPointIndex;
-        while (patrolPoints.Length > 1 && newIndex == currentPointIndex)
+        // --- FIX: Ensure Agent is valid before setting destination ---
+        if (!agent.isOnNavMesh)
         {
-            newIndex = Random.Range(0, patrolPoints.Length);
+            // Try one last time to snap it
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(transform.position, out hit, 2.0f, NavMesh.AllAreas))
+                agent.Warp(hit.position);
+            else
+                return; // Cannot move if not on NavMesh
         }
 
-        currentPointIndex = newIndex;
+        // Random patrol logic
+        int newIndex = currentPointIndex;
+        while (patrolPoints.Length > 1 && newIndex == currentPointIndex)
+            newIndex = Random.Range(0, patrolPoints.Length);
 
+        currentPointIndex = newIndex;
         agent.isStopped = false;
         agent.speed = 3f;
         agent.destination = patrolPoints[currentPointIndex].position;
-
         SetState(EnemyState.Walk);
     }
 
-    //JUMPSCARE
+    // ================= COLLISION & JUMPSCARE =================
     private void OnTriggerEnter(Collider other)
     {
         if (isAttacking) return;
 
         if (other.CompareTag("Player"))
         {
-            // 1. Get the Mask Manager from the object we hit
-            // We use GetComponentInParent in case the collider is on a child object
             MaskManager maskCheck = other.GetComponentInParent<MaskManager>();
+            if (maskCheck != null && maskCheck.isMaskOn) return; // Ignore if mask on
 
-            // 2. THE FIX: If mask is ON, ignore this collision completely!
-            if (maskCheck != null && maskCheck.isMaskOn)
-            {
-                Debug.Log("AI bumped into player, but ignored them (Mask is ON)");
-                return;
-            }
-
-            // 3. If no mask (or mask is off), proceed with Jumpscare/Damage
             PlayerHealth healthScript = other.GetComponentInParent<PlayerHealth>();
             if (healthScript != null)
             {
@@ -293,34 +274,54 @@ public class AI_Chaser : MonoBehaviour
             }
         }
     }
+
     IEnumerator JumpscareSequence()
     {
         isAttacking = true;
-
-        // STOP the AI immediately
         agent.isStopped = true;
         agent.velocity = Vector3.zero;
         SetState(EnemyState.Idle);
 
-        // --- VISUALS ---
+        // SNAP PLAYER ROTATION & FIX AI POSITION
+        if (playerTarget != null)
+        {
+            // 1. Calculate ideal scare position (1.5m in front of player)
+            Vector3 forwardPoint = playerTarget.position + (playerTarget.forward * 1.5f);
+
+            // 2. Validate with NavMesh so we don't spawn inside a wall/void
+            NavMeshHit hit;
+            Vector3 finalPos = forwardPoint;
+
+            // Search for valid floor within 2 units. NavMesh.AllAreas ensures we find ANY walkable spot.
+            if (NavMesh.SamplePosition(forwardPoint, out hit, 2.0f, NavMesh.AllAreas))
+            {
+                finalPos = hit.position;
+            }
+            else
+            {
+                // Fallback: If wall blocked it, spawn directly at player position (collision will push out)
+                // This prevents appearing in 'void'
+                finalPos = playerTarget.position;
+            }
+
+            agent.Warp(finalPos);
+            transform.LookAt(playerTarget); // Force AI to face player
+
+            // 3. Force Player to look at AI (Removed y=0 so camera can pitch up/down)
+            Vector3 directionToEnemy = transform.position + Vector3.up * 1.5f - playerTarget.position; // Look at head height
+
+            Quaternion lookRotation = Quaternion.LookRotation(directionToEnemy);
+            playerTarget.rotation = lookRotation;
+        }
+
         if (jumpscarePanel) jumpscarePanel.SetActive(true);
         if (jumpscareAudio) jumpscareAudio.Play();
 
-        // Wait for the scare to finish (e.g., 2 seconds)
-        yield return new WaitForSeconds(recoveryTime);
+        // Wait for the exposed duration (prevent multiple scares)
+        yield return new WaitForSeconds(jumpscareDuration);
 
         if (jumpscarePanel) jumpscarePanel.SetActive(false);
-
-        // OPTION 1: TELEPORT AWAY (Give player breathing room)
-        // ==========
         TeleportToFarthestPoint();
-        // OPTION 2: FREEZE IN PLACE (Uncomment to use this instead)
-        // ===============
-        // // Just wait a bit longer while player runs, then resume
-        // yield return new WaitForSeconds(3.0f); 
-        // isAttacking = false;
-        // agent.isStopped = false;
-        // =======
     }
 
     void TeleportToFarthestPoint()
@@ -330,11 +331,9 @@ public class AI_Chaser : MonoBehaviour
         Transform bestPoint = null;
         float maxDistance = 0f;
 
-        // Loop through all points to find the one furthest from the player
         foreach (Transform point in patrolPoints)
         {
             float dist = Vector3.Distance(playerTarget.position, point.position);
-
             if (dist > maxDistance)
             {
                 maxDistance = dist;
@@ -344,32 +343,75 @@ public class AI_Chaser : MonoBehaviour
 
         if (bestPoint != null)
         {
-            agent.Warp(bestPoint.position);
-            Debug.Log($"AI retreated to {bestPoint.name} ({maxDistance}m away)");
+            // --- FIX: Verify the destination is valid before warping ---
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(bestPoint.position, out hit, 5.0f, NavMesh.AllAreas))
+            {
+                agent.Warp(hit.position);
+                Debug.Log($"AI retreated to {bestPoint.name} (Valid NavMesh Spot)");
+            }
+            else
+            {
+                // If the patrol point was placed inside a wall/void, warp to the unsafe point anyway as a fallback
+                // or consider picking a different point.
+                agent.Warp(bestPoint.position);
+                Debug.LogWarning($"AI retreated to {bestPoint.name} but NavMesh spot wasn't found nearby!");
+            }
         }
 
-        // --- CRITICAL SAFETY STEP ---
-        // Force the AI to be "blind" for 2 seconds after teleporting.
-        // This prevents it from instantly spotting you if the map is small.
         StartCoroutine(TemporaryBlindness());
     }
 
     IEnumerator TemporaryBlindness()
     {
-        // 1. Reset variables
+        // 1. Reset States
         isAttacking = false;
         agent.isStopped = false;
 
-        // 2. Reduce detection range to 0 temporarily
-        float originalRange = detectionRange;
-        detectionRange = 0f;
+        // 2. DISABLE SENSES (Store original values)
+        float originalHearing = detectionRadius;
+        float originalVision = visionRadius;
 
-        // 3. Start walking to the next point immediately so it doesn't look frozen
+        // --- THE FIX: Set correct variables to 0 ---
+        detectionRadius = 0f;
+        visionRadius = 0f;
+
+        // 3. Start walking immediately
         SetState(EnemyState.Walk);
         GoToNextPatrolPoint();
 
-        // 4. Wait, then restore vision
+        // 4. Wait
         yield return new WaitForSeconds(3.0f);
-        detectionRange = originalRange;
+
+        // 5. RESTORE SENSES
+        detectionRadius = originalHearing;
+        visionRadius = originalVision;
     }
+
+    // ================= GIZMOS =================
+    void OnDrawGizmosSelected()
+    {
+        if (useRadiusDetection)
+        {
+            Gizmos.color = new Color(1, 0, 0, 0.3f);
+            Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        }
+
+        if (useConeVision)
+        {
+            Gizmos.color = Color.yellow;
+            Vector3 viewAngleA = DirFromAngle(-viewAngle / 2, false);
+            Vector3 viewAngleB = DirFromAngle(viewAngle / 2, false);
+            Gizmos.DrawLine(transform.position, transform.position + viewAngleA * visionRadius);
+            Gizmos.DrawLine(transform.position, transform.position + viewAngleB * visionRadius);
+        }
+    }
+
+    public Vector3 DirFromAngle(float angleInDegrees, bool angleIsGlobal)
+    {
+        if (!angleIsGlobal) angleInDegrees += transform.eulerAngles.y;
+        return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad));
+    }
+
+    void SetState(EnemyState state) { anim.SetInteger("AnimState", (int)state); }
 }
