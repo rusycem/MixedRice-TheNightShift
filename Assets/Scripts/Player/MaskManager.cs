@@ -17,6 +17,9 @@ public class MaskManager : MonoBehaviour
     public GameObject maskVisual;
     public float animationDuration = 0.5f;
 
+    [Header("Mask Audio")]
+    public AudioClip maskClip;
+
     // Public property for the AI to read
     public bool isMaskOn { get; private set; }
 
@@ -53,6 +56,7 @@ public class MaskManager : MonoBehaviour
         if (!isMaskOn && (maskEmpty || currentMaskTime <= 0f)) return;
 
         StartCoroutine(PlayMaskToggle());
+        AudioManager.Instance.PlaySFX(maskClip);
     }
 
     IEnumerator PlayMaskToggle()
@@ -92,7 +96,21 @@ public class MaskManager : MonoBehaviour
             if (currentMaskTime <= 0f)
             {
                 currentMaskTime = 0f;
-                maskEmpty = true; // Set this so we know we NEED to regen now
+
+                // Turn off mask & trigger OFF animation
+                isMaskOn = false;
+                regenDelayTimer = regenDelay;
+                maskEmpty = true;
+                //isRegenerating = false;
+
+                Debug.Log("Mask ran out, playing OFF animation");
+
+                if (!isAnimating)
+                    StartCoroutine(AutoMaskOff());
+                // Force toggle OFF if time runs out
+                if (!isAnimating) StartCoroutine(PlayMaskToggle());
+
+                maskEmpty = true;
                 regenDelayTimer = regenDelay;
 
                 if (!isAnimating) StartCoroutine(PlayMaskToggle());
@@ -101,6 +119,38 @@ public class MaskManager : MonoBehaviour
         }
         else
         {
+            if (regenDelayTimer > 0f)
+            {
+                regenDelayTimer -= Time.deltaTime;
+            }
+            else
+            {
+                currentMaskTime += regenSpeed * Time.deltaTime;
+                currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
+
+                if (currentMaskTime >= maxMaskTime)
+                {
+                    currentMaskTime = maxMaskTime;
+                    maskEmpty = false;
+                    //isRegenerating = false;
+                }
+            }
+        }
+    }
+
+    IEnumerator AutoMaskOff()
+    {
+        isAnimating = true;
+        AudioManager.Instance.PlaySFX(maskClip);
+
+        maskAnimator.SetTrigger("OffMask");
+
+        yield return new WaitForSeconds(animationDuration);
+
+        if (maskVisual != null)
+            maskVisual.SetActive(false);
+
+        isAnimating = false;
             // --- REGENERATING ---
             // CHANGE: Added 'maskEmpty' check. 
             // It won't enter this block unless the mask actually ran out.
@@ -124,4 +174,3 @@ public class MaskManager : MonoBehaviour
             }
         }
     }
-}
