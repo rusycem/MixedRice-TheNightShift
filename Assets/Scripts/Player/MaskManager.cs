@@ -101,7 +101,7 @@ public class MaskManager : MonoBehaviour
                 isMaskOn = false;
                 regenDelayTimer = regenDelay;
                 maskEmpty = true;
-                isRegenerating = false;
+                //isRegenerating = false;
 
                 Debug.Log("Mask ran out, playing OFF animation");
 
@@ -130,7 +130,7 @@ public class MaskManager : MonoBehaviour
                 {
                     currentMaskTime = maxMaskTime;
                     maskEmpty = false;
-                    isRegenerating = false;
+                    //isRegenerating = false;
                 }
             }
         }
@@ -169,4 +169,3 @@ public class MaskManager : MonoBehaviour
             }
         }
     }
-}

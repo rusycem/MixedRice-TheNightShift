@@ -32,11 +32,6 @@ public class PlayerMovement : MonoBehaviour
     public MaskManager maskManager;
     public Slider staminaSlider;
 
-    [Header("Footsteps")]
-    public float walkStepInterval = 0.5f;
-    public float runStepInterval = 0.3f;
-    public RandomSoundPlayer footstepPlayer;
-
     private Vector2 moveInput;
     private Vector2 lookInput;
     private bool isRunning;
@@ -137,8 +132,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleFootsteps()
     {
-        if (!controller.isGrounded || footstepPlayer == null)
-            return;
 
         bool isMoving = moveInput.magnitude > 0.1f;
         if (!isMoving)
@@ -149,16 +142,6 @@ public class PlayerMovement : MonoBehaviour
 
         bool maskActive = maskManager != null && maskManager.isMaskOn;
         bool sprinting = isRunning && !maskActive && currentStamina > 0f;
-
-        float interval = sprinting ? runStepInterval : walkStepInterval;
-
-        footstepTimer -= Time.deltaTime;
-
-        if (footstepTimer <= 0f)
-        {
-            footstepPlayer.Play();
-            footstepTimer = interval;
-        }
     }
 
     private void OnMove(InputValue value)
