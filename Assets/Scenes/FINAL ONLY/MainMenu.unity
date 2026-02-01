@@ -1501,7 +1501,7 @@ MonoBehaviour:
   optionsPanel: {fileID: 1869493318}
   creditsPanel: {fileID: 1476645481}
   fadeCanvasGroup: {fileID: 781749733}
-  nextSceneName: EnemyAI
+  nextSceneName: FinalLevel
   transitionDuration: 1
   slideDuration: 0.4
 --- !u!114 &428140662
