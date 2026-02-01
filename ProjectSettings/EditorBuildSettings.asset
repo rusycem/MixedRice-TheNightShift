@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/FINAL ONLY/FinalLevel.unity
     guid: b5701fc3f0393944c9d40a50b1f7fb92
   - enabled: 1
+    path: Assets/Scenes/FINAL ONLY/WinScene.unity
+    guid: cd05663a6cc8bd748a44122c31b23a40
+  - enabled: 1
     path: Assets/Scenes/BlockoutPiecesScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
