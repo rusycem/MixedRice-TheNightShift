@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI; 
+using UnityEngine.UI;
 using System.Collections;
 
 public class MaskManager : MonoBehaviour
@@ -20,30 +20,25 @@ public class MaskManager : MonoBehaviour
     [Header("Mask Audio")]
     public AudioClip maskClip;
 
+    // Public property for the AI to read
     public bool isMaskOn { get; private set; }
 
     private float currentMaskTime;
     private float regenDelayTimer = 0f;
-    private int lastSecond = -1;
-    private bool isRegenerating = false;
     private bool maskEmpty = false;
     private bool isAnimating = false;
 
     private void Start()
     {
         currentMaskTime = maxMaskTime;
-
-        if (maskVisual != null)
-            maskVisual.SetActive(false);
+        if (maskVisual != null) maskVisual.SetActive(false);
     }
 
     private void Update()
     {
-        UpdateMaskTime();
+        UpdateMaskLogic(); // Renamed for clarity
         UpdateUI();
-        //DebugCountdown();
     }
-
 
     void UpdateUI()
     {
@@ -52,10 +47,13 @@ public class MaskManager : MonoBehaviour
             maskFillImage.fillAmount = currentMaskTime / maxMaskTime;
         }
     }
+
     public void ToggleMask()
     {
         if (isAnimating) return;
-        if (!isMaskOn && currentMaskTime == 0f) return;
+
+        // Cannot turn on if empty
+        if (!isMaskOn && (maskEmpty || currentMaskTime <= 0f)) return;
 
         StartCoroutine(PlayMaskToggle());
         AudioManager.Instance.PlaySFX(maskClip);
@@ -67,35 +65,32 @@ public class MaskManager : MonoBehaviour
 
         if (!isMaskOn)
         {
-            if (maskVisual != null)
-                maskVisual.SetActive(true);
-
-            maskAnimator.SetTrigger("OnMask");
+            // TURN ON
+            if (maskVisual != null) maskVisual.SetActive(true);
+            if (maskAnimator) maskAnimator.SetTrigger("OnMask");
             isMaskOn = true;
+            maskEmpty = false; // Reset empty flag immediately
         }
         else
         {
-            // Play OFF animation first
-            maskAnimator.SetTrigger("OffMask");
+            // TURN OFF
+            if (maskAnimator) maskAnimator.SetTrigger("OffMask");
             isMaskOn = false;
         }
 
-        Debug.Log(isMaskOn ? "Mask ON" : "Mask OFF");
-
-        // Wait until animation finishes
         yield return new WaitForSeconds(animationDuration);
 
-        // Hide mask AFTER OFF animation
-        if (!isMaskOn && maskVisual != null)
-            maskVisual.SetActive(false);
+        // Cleanup after turning off
+        if (!isMaskOn && maskVisual != null) maskVisual.SetActive(false);
 
         isAnimating = false;
     }
 
-    void UpdateMaskTime()
+    void UpdateMaskLogic()
     {
         if (isMaskOn)
         {
+            // --- DRAINING ---
             currentMaskTime -= Time.deltaTime;
 
             if (currentMaskTime <= 0f)
@@ -112,9 +107,15 @@ public class MaskManager : MonoBehaviour
 
                 if (!isAnimating)
                     StartCoroutine(AutoMaskOff());
+                // Force toggle OFF if time runs out
+                if (!isAnimating) StartCoroutine(PlayMaskToggle());
+
+                maskEmpty = true;
+                regenDelayTimer = regenDelay;
+                Debug.Log("Mask ran out!");
             }
         }
-        else if (maskEmpty)
+        else
         {
             if (regenDelayTimer > 0f)
             {
@@ -148,6 +149,24 @@ public class MaskManager : MonoBehaviour
             maskVisual.SetActive(false);
 
         isAnimating = false;
+            // --- REGENERATING ---
+            // Only regen if we are not currently animating and logic allows it
+            if (currentMaskTime < maxMaskTime)
+            {
+                if (regenDelayTimer > 0f)
+                {
+                    regenDelayTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    currentMaskTime += regenSpeed * Time.deltaTime;
+                    if (currentMaskTime > maxMaskTime)
+                    {
+                        currentMaskTime = maxMaskTime;
+                        maskEmpty = false;
+                    }
+                }
+            }
+        }
     }
-
 }

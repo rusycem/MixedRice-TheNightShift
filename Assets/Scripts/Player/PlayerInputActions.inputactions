@@ -52,6 +52,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Pause",
+                    "type": "Button",
+                    "id": "e41d2c88-0ca6-41b4-b4d4-738935c86685",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "TestHitMe",
                     "type": "Button",
                     "id": "3453f7b6-4cbe-477f-962e-2fd47b144ddd",
