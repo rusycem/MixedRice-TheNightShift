@@ -17,6 +17,9 @@ public class MaskManager : MonoBehaviour
     public GameObject maskVisual;
     public float animationDuration = 0.5f;
 
+    [Header("Mask Audio")]
+    public AudioClip maskClip;
+
     public bool isMaskOn { get; private set; }
 
     private float currentMaskTime;
@@ -55,6 +58,7 @@ public class MaskManager : MonoBehaviour
         if (!isMaskOn && currentMaskTime == 0f) return;
 
         StartCoroutine(PlayMaskToggle());
+        AudioManager.Instance.PlaySFX(maskClip);
     }
 
     IEnumerator PlayMaskToggle()
@@ -134,6 +138,7 @@ public class MaskManager : MonoBehaviour
     IEnumerator AutoMaskOff()
     {
         isAnimating = true;
+        AudioManager.Instance.PlaySFX(maskClip);
 
         maskAnimator.SetTrigger("OffMask");
 
