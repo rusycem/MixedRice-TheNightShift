@@ -19,27 +19,34 @@ public class ItemSpawner : MonoBehaviour
 
     public void SpawnAllKeys()
     {
-        // Loop through the list and spawn each specific key once
+        int successfulSpawns = 0;
+
+        // Loop through the list
         foreach (GameObject keyPrefab in distinctKeys)
         {
-            SpawnSingleKey(keyPrefab);
+            // Try to spawn and capture the result (true/false)
+            if (SpawnSingleKey(keyPrefab))
+            {
+                successfulSpawns++;
+            }
         }
+
+        Debug.Log($"SPAWN REPORT: Successfully spawned {successfulSpawns} / {distinctKeys.Count} keys.");
     }
 
-    void SpawnSingleKey(GameObject prefab)
+    bool SpawnSingleKey(GameObject prefab)
     {
-        // Try to find a valid point 30 times before giving up
-        // (Prevents infinite loops if the map is tiny)
         for (int i = 0; i < 30; i++)
         {
             if (GetRandomPoint(out Vector3 spawnPoint))
             {
                 Instantiate(prefab, spawnPoint, Quaternion.identity);
-                return; // Success! Stop trying for this key.
+                return true; // Success!
             }
         }
 
-        Debug.LogWarning($"Could not find a spot for {prefab.name}");
+        Debug.LogWarning($"FAILED to spawn: {prefab.name}");
+        return false; // Failure
     }
 
     bool GetRandomPoint(out Vector3 result)
