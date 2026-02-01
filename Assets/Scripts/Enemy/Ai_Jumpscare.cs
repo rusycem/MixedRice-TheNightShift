@@ -32,6 +32,6 @@ public class JumpscareEffect : MonoBehaviour
         rectTransform.anchoredPosition = originalPos + new Vector3(x, y, 0);
 
         // 2. ZOOM EFFECT (Slowly get bigger)
-        rectTransform.localScale += Vector3.one * zoomSpeed * Time.deltaTime;
+        //rectTransform.localScale += Vector3.one * zoomSpeed * Time.deltaTime;
     }
 }

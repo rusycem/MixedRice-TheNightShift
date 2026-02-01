@@ -2109,6 +2109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84269816971b7c044b28056202806f3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  mainMenuScene: {fileID: 0}
 --- !u!114 &6744532506312560550
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2862,8 +2863,8 @@ RectTransform:
   - {fileID: 8615920843603160878}
   - {fileID: 1568967270488497024}
   - {fileID: 5965403280790543696}
-  - {fileID: 4267850821627292856}
   - {fileID: 8256541877382014965}
+  - {fileID: 4267850821627292856}
   - {fileID: 1864354883856717786}
   - {fileID: 497310627607141185}
   - {fileID: 5949991884820521134}
