@@ -196,8 +196,7 @@ public class AI_Chaser : MonoBehaviour
 
         // OPTION 1: TELEPORT AWAY (Give player breathing room)
         // ==========
-        TeleportToSafeSpot();
-
+        TeleportToFarthestPoint();
         // OPTION 2: FREEZE IN PLACE (Uncomment to use this instead)
         // ===============
         // // Just wait a bit longer while player runs, then resume
@@ -207,30 +206,53 @@ public class AI_Chaser : MonoBehaviour
         // =======
     }
 
-    void TeleportToSafeSpot()
+    void TeleportToFarthestPoint()
     {
-        // 1. Pick a random safe spot from your existing Patrol Points
-        if (patrolPoints.Length > 0)
+        if (patrolPoints.Length == 0) return;
+
+        Transform bestPoint = null;
+        float maxDistance = 0f;
+
+        // Loop through all points to find the one furthest from the player
+        foreach (Transform point in patrolPoints)
         {
-            int randomIndex = Random.Range(0, patrolPoints.Length);
+            float dist = Vector3.Distance(playerTarget.position, point.position);
 
-            // Warp moves the agent instantly without confusing the pathfinder
-            agent.Warp(patrolPoints[randomIndex].position);
+            if (dist > maxDistance)
+            {
+                maxDistance = dist;
+                bestPoint = point;
+            }
         }
-        else
+
+        if (bestPoint != null)
         {
-            // Fallback: If no patrol points exist, send it back to (0,0,0) or keep it here
-            Debug.LogWarning("No Patrol Points found! AI warped to zero.");
-            agent.Warp(Vector3.zero);
+            agent.Warp(bestPoint.position);
+            Debug.Log($"AI retreated to {bestPoint.name} ({maxDistance}m away)");
         }
 
-        // 2. Reset the AI Brain
-        isAttacking = false;   // Allow it to attack again later
-        isWaiting = false;     // Stop any waiting coroutines
-        agent.isStopped = false; // Force movement to restart
+        // --- CRITICAL SAFETY STEP ---
+        // Force the AI to be "blind" for 2 seconds after teleporting.
+        // This prevents it from instantly spotting you if the map is small.
+        StartCoroutine(TemporaryBlindness());
+    }
 
-        // 3. Immediately start patrolling from this new spot
+    IEnumerator TemporaryBlindness()
+    {
+        // 1. Reset variables
+        isAttacking = false;
+        agent.isStopped = false;
+
+        // 2. Reduce detection range to 0 temporarily
+        float originalRange = detectionRange;
+        detectionRange = 0f;
+
+        // 3. Start walking to the next point immediately so it doesn't look frozen
         SetState(EnemyState.Walk);
         GoToNextPatrolPoint();
+
+        // 4. Wait, then restore vision
+        yield return new WaitForSeconds(3.0f);
+        detectionRange = originalRange;
     }
 }
