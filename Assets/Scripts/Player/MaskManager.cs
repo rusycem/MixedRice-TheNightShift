@@ -96,21 +96,7 @@ public class MaskManager : MonoBehaviour
             if (currentMaskTime <= 0f)
             {
                 currentMaskTime = 0f;
-
-                // Turn off mask & trigger OFF animation
-                isMaskOn = false;
-                regenDelayTimer = regenDelay;
-                maskEmpty = true;
-                //isRegenerating = false;
-
-                Debug.Log("Mask ran out, playing OFF animation");
-
-                if (!isAnimating)
-                    StartCoroutine(AutoMaskOff());
-                // Force toggle OFF if time runs out
-                if (!isAnimating) StartCoroutine(PlayMaskToggle());
-
-                maskEmpty = true;
+                maskEmpty = true; // Set this so we know we NEED to regen now
                 regenDelayTimer = regenDelay;
 
                 if (!isAnimating) StartCoroutine(PlayMaskToggle());
@@ -119,20 +105,25 @@ public class MaskManager : MonoBehaviour
         }
         else
         {
-            if (regenDelayTimer > 0f)
+            // --- REGENERATING ---
+            // CHANGE: Added 'maskEmpty' check. 
+            // It won't enter this block unless the mask actually ran out.
+            if (maskEmpty && currentMaskTime < maxMaskTime)
             {
-                regenDelayTimer -= Time.deltaTime;
-            }
-            else
-            {
-                currentMaskTime += regenSpeed * Time.deltaTime;
-                currentMaskTime = Mathf.Clamp(currentMaskTime, 0f, maxMaskTime);
-
-                if (currentMaskTime >= maxMaskTime)
+                if (regenDelayTimer > 0f)
                 {
-                    currentMaskTime = maxMaskTime;
-                    maskEmpty = false;
-                    //isRegenerating = false;
+                    regenDelayTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    currentMaskTime += regenSpeed * Time.deltaTime;
+
+                    if (currentMaskTime >= maxMaskTime)
+                    {
+                        currentMaskTime = maxMaskTime;
+                        maskEmpty = false; // Finally full! Can use it again.
+                        Debug.Log("Mask fully recharged.");
+                    }
                 }
             }
         }
