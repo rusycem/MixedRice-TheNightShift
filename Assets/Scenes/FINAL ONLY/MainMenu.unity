@@ -1009,6 +1009,8 @@ MonoBehaviour:
   scaleAmount: 1.15
   slideAmount: 10
   animationDuration: 0.2
+  hoverClip: {fileID: 8300000, guid: 04e83e5d152cf7b4186c362d1c5da5d1, type: 3}
+  clickClip: {fileID: 8300000, guid: 40c965b59a240c34c86c8497a1f85c20, type: 3}
 --- !u!114 &351501356
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1103,6 +1105,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 351501353}
   m_CullTransparentMesh: 1
+--- !u!1001 &352872592
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1138051587797475829, guid: 73ae599de844cfb4f804134446533fbc, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 142.212
+      objectReference: {fileID: 0}
+    - target: {fileID: 1138051587797475829, guid: 73ae599de844cfb4f804134446533fbc, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -139.44035
+      objectReference: {fileID: 0}
+    - target: {fileID: 1138051587797475829, guid: 73ae599de844cfb4f804134446533fbc, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -34.77298
+      objectReference: {fileID: 0}
+    - target: {fileID: 1138051587797475829, guid: 73ae599de844cfb4f804134446533fbc, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1138051587797475829, guid: 73ae599de844cfb4f804134446533fbc, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1138051587797475829, guid: 73ae599de844cfb4f804134446533fbc, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1138051587797475829, guid: 73ae599de844cfb4f804134446533fbc, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1138051587797475829, guid: 73ae599de844cfb4f804134446533fbc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1138051587797475829, guid: 73ae599de844cfb4f804134446533fbc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1138051587797475829, guid: 73ae599de844cfb4f804134446533fbc, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2142630389544743149, guid: 73ae599de844cfb4f804134446533fbc, type: 3}
+      propertyPath: m_Name
+      value: Audio Manager
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 73ae599de844cfb4f804134446533fbc, type: 3}
 --- !u!1 &359548931
 GameObject:
   m_ObjectHideFlags: 0
@@ -2290,6 +2349,8 @@ MonoBehaviour:
   scaleAmount: 1.15
   slideAmount: 10
   animationDuration: 0.2
+  hoverClip: {fileID: 8300000, guid: 04e83e5d152cf7b4186c362d1c5da5d1, type: 3}
+  clickClip: {fileID: 8300000, guid: 40c965b59a240c34c86c8497a1f85c20, type: 3}
 --- !u!1 &760938075
 GameObject:
   m_ObjectHideFlags: 0
@@ -2981,6 +3042,8 @@ MonoBehaviour:
   scaleAmount: 1.15
   slideAmount: 10
   animationDuration: 0.2
+  hoverClip: {fileID: 8300000, guid: 04e83e5d152cf7b4186c362d1c5da5d1, type: 3}
+  clickClip: {fileID: 8300000, guid: 40c965b59a240c34c86c8497a1f85c20, type: 3}
 --- !u!114 &891551333
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3224,6 +3287,8 @@ MonoBehaviour:
   scaleAmount: 1.15
   slideAmount: 10
   animationDuration: 0.2
+  hoverClip: {fileID: 8300000, guid: 04e83e5d152cf7b4186c362d1c5da5d1, type: 3}
+  clickClip: {fileID: 8300000, guid: 40c965b59a240c34c86c8497a1f85c20, type: 3}
 --- !u!1 &918365682
 GameObject:
   m_ObjectHideFlags: 0
@@ -3373,6 +3438,8 @@ MonoBehaviour:
   scaleAmount: 1.15
   slideAmount: 10
   animationDuration: 0.2
+  hoverClip: {fileID: 8300000, guid: 04e83e5d152cf7b4186c362d1c5da5d1, type: 3}
+  clickClip: {fileID: 8300000, guid: 40c965b59a240c34c86c8497a1f85c20, type: 3}
 --- !u!1 &950686405
 GameObject:
   m_ObjectHideFlags: 0
@@ -3597,6 +3664,8 @@ MonoBehaviour:
   scaleAmount: 1.15
   slideAmount: 10
   animationDuration: 0.2
+  hoverClip: {fileID: 8300000, guid: 04e83e5d152cf7b4186c362d1c5da5d1, type: 3}
+  clickClip: {fileID: 8300000, guid: 40c965b59a240c34c86c8497a1f85c20, type: 3}
 --- !u!1 &1160402543
 GameObject:
   m_ObjectHideFlags: 0
@@ -4938,3 +5007,4 @@ SceneRoots:
   - {fileID: 1844395305}
   - {fileID: 428140660}
   - {fileID: 2142303119}
+  - {fileID: 352872592}
