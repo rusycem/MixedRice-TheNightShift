@@ -20,25 +20,30 @@ public class MaskManager : MonoBehaviour
     [Header("Mask Audio")]
     public AudioClip maskClip;
 
-    // Public property for the AI to read
     public bool isMaskOn { get; private set; }
 
     private float currentMaskTime;
     private float regenDelayTimer = 0f;
+    private int lastSecond = -1;
+    private bool isRegenerating = false;
     private bool maskEmpty = false;
     private bool isAnimating = false;
 
     private void Start()
     {
         currentMaskTime = maxMaskTime;
-        if (maskVisual != null) maskVisual.SetActive(false);
+
+        if (maskVisual != null)
+            maskVisual.SetActive(false);
     }
 
     private void Update()
     {
-        UpdateMaskLogic(); // Renamed for clarity
+        UpdateMaskTime();
         UpdateUI();
+        //DebugCountdown();
     }
+
 
     void UpdateUI()
     {
@@ -47,13 +52,10 @@ public class MaskManager : MonoBehaviour
             maskFillImage.fillAmount = currentMaskTime / maxMaskTime;
         }
     }
-
     public void ToggleMask()
     {
         if (isAnimating) return;
-
-        // Cannot turn on if empty
-        if (!isMaskOn && (maskEmpty || currentMaskTime <= 0f)) return;
+        if (!isMaskOn && currentMaskTime == 0f) return;
 
         StartCoroutine(PlayMaskToggle());
         AudioManager.Instance.PlaySFX(maskClip);
@@ -65,32 +67,35 @@ public class MaskManager : MonoBehaviour
 
         if (!isMaskOn)
         {
-            // TURN ON
-            if (maskVisual != null) maskVisual.SetActive(true);
-            if (maskAnimator) maskAnimator.SetTrigger("OnMask");
+            if (maskVisual != null)
+                maskVisual.SetActive(true);
+
+            maskAnimator.SetTrigger("OnMask");
             isMaskOn = true;
-            maskEmpty = false; // Reset empty flag immediately
         }
         else
         {
-            // TURN OFF
-            if (maskAnimator) maskAnimator.SetTrigger("OffMask");
+            // Play OFF animation first
+            maskAnimator.SetTrigger("OffMask");
             isMaskOn = false;
         }
 
+        Debug.Log(isMaskOn ? "Mask ON" : "Mask OFF");
+
+        // Wait until animation finishes
         yield return new WaitForSeconds(animationDuration);
 
-        // Cleanup after turning off
-        if (!isMaskOn && maskVisual != null) maskVisual.SetActive(false);
+        // Hide mask AFTER OFF animation
+        if (!isMaskOn && maskVisual != null)
+            maskVisual.SetActive(false);
 
         isAnimating = false;
     }
 
-    void UpdateMaskLogic()
+    void UpdateMaskTime()
     {
         if (isMaskOn)
         {
-            // --- DRAINING ---
             currentMaskTime -= Time.deltaTime;
 
             if (currentMaskTime <= 0f)
@@ -101,23 +106,15 @@ public class MaskManager : MonoBehaviour
                 isMaskOn = false;
                 regenDelayTimer = regenDelay;
                 maskEmpty = true;
-                //isRegenerating = false;
+                isRegenerating = false;
 
                 Debug.Log("Mask ran out, playing OFF animation");
 
                 if (!isAnimating)
                     StartCoroutine(AutoMaskOff());
-                // Force toggle OFF if time runs out
-                if (!isAnimating) StartCoroutine(PlayMaskToggle());
-
-                maskEmpty = true;
-                regenDelayTimer = regenDelay;
-
-                if (!isAnimating) StartCoroutine(PlayMaskToggle());
-                Debug.Log("Mask empty! Starting recharge cycle...");
             }
         }
-        else
+        else if (maskEmpty)
         {
             if (regenDelayTimer > 0f)
             {
@@ -132,7 +129,7 @@ public class MaskManager : MonoBehaviour
                 {
                     currentMaskTime = maxMaskTime;
                     maskEmpty = false;
-                    //isRegenerating = false;
+                    isRegenerating = false;
                 }
             }
         }
@@ -151,26 +148,6 @@ public class MaskManager : MonoBehaviour
             maskVisual.SetActive(false);
 
         isAnimating = false;
-        // --- REGENERATING ---
-        // CHANGE: Added 'maskEmpty' check. 
-        // It won't enter this block unless the mask actually ran out.
-        if (maskEmpty && currentMaskTime < maxMaskTime)
-        {
-            if (regenDelayTimer > 0f)
-            {
-                regenDelayTimer -= Time.deltaTime;
-            }
-            else
-            {
-                currentMaskTime += regenSpeed * Time.deltaTime;
-
-                if (currentMaskTime >= maxMaskTime)
-                {
-                    currentMaskTime = maxMaskTime;
-                    maskEmpty = false; // Finally full! Can use it again.
-                    Debug.Log("Mask fully recharged.");
-                }
-            }
-        }
     }
+
 }
