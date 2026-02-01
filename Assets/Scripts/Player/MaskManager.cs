@@ -17,9 +17,6 @@ public class MaskManager : MonoBehaviour
     public GameObject maskVisual;
     public float animationDuration = 0.5f;
 
-    [Header("Mask Audio")]
-    public AudioClip maskClip;
-
     // Public property for the AI to read
     public bool isMaskOn { get; private set; }
 
@@ -56,7 +53,6 @@ public class MaskManager : MonoBehaviour
         if (!isMaskOn && (maskEmpty || currentMaskTime <= 0f)) return;
 
         StartCoroutine(PlayMaskToggle());
-        AudioManager.Instance.PlaySFX(maskClip);
     }
 
     IEnumerator PlayMaskToggle()
@@ -107,18 +103,12 @@ public class MaskManager : MonoBehaviour
                 isMaskOn = false;
                 regenDelayTimer = regenDelay;
                 maskEmpty = true;
-                //isRegenerating = false;
+                isRegenerating = false;
 
                 Debug.Log("Mask ran out, playing OFF animation");
 
                 if (!isAnimating)
                     StartCoroutine(AutoMaskOff());
-                // Force toggle OFF if time runs out
-                if (!isAnimating) StartCoroutine(PlayMaskToggle());
-
-                maskEmpty = true;
-                regenDelayTimer = regenDelay;
-                Debug.Log("Mask ran out!");
             }
         }
         else
@@ -155,7 +145,7 @@ public class MaskManager : MonoBehaviour
                 {
                     currentMaskTime = maxMaskTime;
                     maskEmpty = false;
-                    //isRegenerating = false;
+                    isRegenerating = false;
                 }
             }
         }
@@ -164,7 +154,6 @@ public class MaskManager : MonoBehaviour
     IEnumerator AutoMaskOff()
     {
         isAnimating = true;
-        AudioManager.Instance.PlaySFX(maskClip);
 
         maskAnimator.SetTrigger("OffMask");
 
@@ -174,23 +163,5 @@ public class MaskManager : MonoBehaviour
             maskVisual.SetActive(false);
 
         isAnimating = false;
-            // --- REGENERATING ---
-            // Only regen if we are not currently animating and logic allows it
-            if (currentMaskTime < maxMaskTime)
-            {
-                if (regenDelayTimer > 0f)
-                {
-                    regenDelayTimer -= Time.deltaTime;
-                }
-                else
-                {
-                    currentMaskTime += regenSpeed * Time.deltaTime;
-                    if (currentMaskTime > maxMaskTime)
-                    {
-                        currentMaskTime = maxMaskTime;
-                        maskEmpty = false;
-                    }
-                }
-            }
-        }
     }
+}

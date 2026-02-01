@@ -1,9 +1,8 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using System.Collections;
 
-public class Button : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+public class Button : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [Header("Animation Settings")]
     public float scaleAmount = 1.15f;
@@ -12,13 +11,9 @@ public class Button : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, 
 
     private Vector3 originalScale;
     private Vector2 originalPosition;
-
+    
     private RectTransform rectTransform;
     private Coroutine activeRoutine;
-
-    [Header("Sound Settings")]
-    public AudioClip hoverClip;
-    public AudioClip clickClip;
 
     void Start()
     {
@@ -31,28 +26,17 @@ public class Button : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, 
     public void OnPointerEnter(PointerEventData eventData)
     {
         StopCurrentAnimation();
-
-        // Play hover sound
-        if (hoverClip != null)
-            AudioManager.Instance.PlaySFX(hoverClip);
-
         Vector3 targetScale = originalScale * scaleAmount;
         Vector2 targetPos = originalPosition + new Vector2(-slideAmount, 0f);
-
+        
         activeRoutine = StartCoroutine(AnimateButton(targetScale, targetPos));
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         StopCurrentAnimation();
+        
         activeRoutine = StartCoroutine(AnimateButton(originalScale, originalPosition));
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        // Play click sound
-        if (clickClip != null)
-            AudioManager.Instance.PlaySFX(clickClip);
     }
 
     private void StopCurrentAnimation()
@@ -71,11 +55,12 @@ public class Button : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, 
         {
             elapsed += Time.deltaTime;
             float t = elapsed / animationDuration;
+            
             float curve = Mathf.SmoothStep(0f, 1f, t);
 
             transform.localScale = Vector3.Lerp(startScale, targetScale, curve);
             rectTransform.anchoredPosition = Vector2.Lerp(startPos, targetPos, curve);
-
+            
             yield return null;
         }
 
