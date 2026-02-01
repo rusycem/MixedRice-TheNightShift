@@ -92,19 +92,19 @@ public class MaskManager : MonoBehaviour
             if (currentMaskTime <= 0f)
             {
                 currentMaskTime = 0f;
-                // Force toggle OFF if time runs out
-                if (!isAnimating) StartCoroutine(PlayMaskToggle());
-
-                maskEmpty = true;
+                maskEmpty = true; // Set this so we know we NEED to regen now
                 regenDelayTimer = regenDelay;
-                Debug.Log("Mask ran out!");
+
+                if (!isAnimating) StartCoroutine(PlayMaskToggle());
+                Debug.Log("Mask empty! Starting recharge cycle...");
             }
         }
         else
         {
             // --- REGENERATING ---
-            // Only regen if we are not currently animating and logic allows it
-            if (currentMaskTime < maxMaskTime)
+            // CHANGE: Added 'maskEmpty' check. 
+            // It won't enter this block unless the mask actually ran out.
+            if (maskEmpty && currentMaskTime < maxMaskTime)
             {
                 if (regenDelayTimer > 0f)
                 {
@@ -113,10 +113,12 @@ public class MaskManager : MonoBehaviour
                 else
                 {
                     currentMaskTime += regenSpeed * Time.deltaTime;
-                    if (currentMaskTime > maxMaskTime)
+
+                    if (currentMaskTime >= maxMaskTime)
                     {
                         currentMaskTime = maxMaskTime;
-                        maskEmpty = false;
+                        maskEmpty = false; // Finally full! Can use it again.
+                        Debug.Log("Mask fully recharged.");
                     }
                 }
             }
