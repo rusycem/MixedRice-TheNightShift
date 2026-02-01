@@ -9,10 +9,19 @@ public class ItemPickup : MonoBehaviour
     [Header("Inventory (Optional)")]
     public IntVariable specificKey;    // Drag 'RedKeyCount', 'BlueKeyCount' etc. here
 
+    [Header("Audio")]
+    public AudioClip pickupSound;      // Drag your pickup SFX here
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
+            // Play SFX using the Audio Manager instance
+            if (pickupSound != null && GameAudioManager.instance != null)
+            {
+                GameAudioManager.instance.PlaySFX(pickupSound);
+            }
+
             // 1. Add to the Global Total (For the Door/UI)
             totalKeys?.ApplyChange(1);
 

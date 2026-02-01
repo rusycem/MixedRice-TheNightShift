@@ -123,6 +123,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RedKey
       objectReference: {fileID: 0}
+    - target: {fileID: 4721893746306239010, guid: 004e640f66f173846a5ec22b295ed248, type: 3}
+      propertyPath: pickupSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 569c3c68e885c7b40acc590067c894e0, type: 3}
     - target: {fileID: 6332587857828717849, guid: 004e640f66f173846a5ec22b295ed248, type: 3}
       propertyPath: m_Size.x
       value: 0.9923182

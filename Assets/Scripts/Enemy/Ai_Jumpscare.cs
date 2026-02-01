@@ -1,37 +1,43 @@
 using UnityEngine;
+using System.Collections;
 
-public class JumpscareEffect : MonoBehaviour
+public class CameraJumpscare : MonoBehaviour
 {
-    [Header("Settings")]
-    public float shakeAmount = 10f; // How violently it shakes
-    public float zoomSpeed = 1.5f;  // How fast it zooms into your face
+    private Quaternion originalRotation;
+    public Transform aiMesh;
+    public float returnSpeed = 5f;
 
-    private Vector3 originalPos;
-    private Vector3 originalScale;
-    private RectTransform rectTransform;
-
-    void Awake()
+    public void TriggerJumpscare(float duration)
     {
-        rectTransform = GetComponent<RectTransform>();
-        originalPos = rectTransform.anchoredPosition;
-        originalScale = rectTransform.localScale;
+        StartCoroutine(JumpscareRoutine(duration));
     }
 
-    void OnEnable()
+    IEnumerator JumpscareRoutine(float duration)
     {
-        // Reset whenever the panel turns on
-        rectTransform.anchoredPosition = originalPos;
-        rectTransform.localScale = originalScale;
-    }
+        // 1. Save the EXACT rotation before the mess starts
+        originalRotation = transform.rotation;
 
-    void Update()
-    {
-        // 1. SHAKE EFFECT (Randomly jitter the position)
-        float x = Random.Range(-shakeAmount, shakeAmount);
-        float y = Random.Range(-shakeAmount, shakeAmount);
-        rectTransform.anchoredPosition = originalPos + new Vector3(x, y, 0);
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            // 2. Force look at AI
+            Vector3 direction = aiMesh.position - transform.position;
+            transform.rotation = Quaternion.LookRotation(direction);
 
-        // 2. ZOOM EFFECT (Slowly get bigger)
-        //rectTransform.localScale += Vector3.one * zoomSpeed * Time.deltaTime;
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // 3. Smoothly return to original rotation
+        float returnElapsed = 0f;
+        while (returnElapsed < 1f)
+        {
+            transform.rotation = Quaternion.Slerp(transform.rotation, originalRotation, returnElapsed);
+            returnElapsed += Time.deltaTime * returnSpeed;
+            yield return null;
+        }
+
+        // 4. Final Snap to ensure 100% accuracy
+        transform.rotation = originalRotation;
     }
 }

@@ -142,6 +142,7 @@ MonoBehaviour:
   totalKeys: {fileID: 11400000, guid: 7b7367c31542b3340819766bd2029063, type: 2}
   onKeyCollected: {fileID: 11400000, guid: 9437035d617842c46976553b550fb7c6, type: 2}
   specificKey: {fileID: 0}
+  pickupSound: {fileID: 8300000, guid: 569c3c68e885c7b40acc590067c894e0, type: 3}
 --- !u!114 &1739107328277812516
 MonoBehaviour:
   m_ObjectHideFlags: 0

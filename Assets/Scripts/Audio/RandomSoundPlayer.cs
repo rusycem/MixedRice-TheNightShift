@@ -1,9 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Audio; // Required for AudioMixerGroup
 
 public class RandomSoundPlayer : MonoBehaviour
 {
     public List<AudioClip> clips;
+
+    [Header("Volume & Mixer")]
+    public AudioMixerGroup outputGroup; // Drag your 'SFX' Mixer Group here
+    [Range(0f, 1f)] public float volume = 1f;
 
     [Header("Pitch Settings")]
     public bool randomPitch = true;
@@ -28,6 +33,12 @@ public class RandomSoundPlayer : MonoBehaviour
         source.maxDistance = maxDistance;
         source.rolloffMode = rolloffMode;
         source.playOnAwake = false;
+
+        // --- NEW: Assign the Mixer Group ---
+        if (outputGroup != null)
+        {
+            source.outputAudioMixerGroup = outputGroup;
+        }
     }
 
     public void Play()
@@ -41,6 +52,9 @@ public class RandomSoundPlayer : MonoBehaviour
         // Apply pitch variation
         if (randomPitch)
             source.pitch = Random.Range(minPitch, maxPitch);
+
+        // --- NEW: Apply Volume ---
+        source.volume = volume;
 
         source.Play();
     }
