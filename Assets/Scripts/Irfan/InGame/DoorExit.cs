@@ -1,29 +1,38 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // Needed if you want to load the cutscene scene directly
+using UnityEngine.SceneManagement;
 
 public class DoorExit : MonoBehaviour
 {
     [Header("Requirements")]
-    public IntVariable totalKeys; // ScriptableObject tracking current & max keys
+    public IntVariable totalKeys;
 
-    [Header("Visuals")]
-    public SpriteRenderer doorRenderer; // Drag your sprite renderer here
-    public Sprite lockedSprite;         // The default "Closed" sprite
-    public Sprite unlockedSprite;       // The "Open" sprite shown when keys are collected
+    [Header("Visuals - 3D (Mesh)")]
+    public MeshRenderer statusQuad; // The light/screen that turns Green
+    public Material lockedMat;      // Red
+    public Material unlockedMat;    // Green
 
-    [Header("Win Condition")]
-    public GameEvent onLevelComplete;   // Trigger this event to play cutscene/win logic
-    public string cutsceneSceneName;    // OR load this scene directly
+    [Header("Visuals - 2D (Sprite)")]
+    public SpriteRenderer doorSpriteRenderer; // Optional: For sprite-based doors
+    public Sprite lockedSprite;     // Sprite for closed state
+    public Sprite unlockedSprite;   // Sprite for open state
 
+    [Header("Physics & Win")]
+    public Collider doorCollider;     // The box collider blocking the path
+    public GameEvent onLevelComplete; // (Optional) Event to trigger UI/Sounds
+    public string cutsceneSceneName;  // (Optional) Scene to load
+
+    // Internal state to track if we are open
     private bool isUnlocked = false;
 
-    private void Start()
+    void Start()
     {
-        // Ensure the door looks locked at the start
-        if (doorRenderer != null && lockedSprite != null)
-        {
-            doorRenderer.sprite = lockedSprite;
-        }
+        // Quality of Life: Try to find components automatically
+        if (statusQuad == null) statusQuad = GetComponentInChildren<MeshRenderer>();
+        if (doorSpriteRenderer == null) doorSpriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (doorCollider == null) doorCollider = GetComponent<Collider>();
+
+        // Initialize state
+        UpdateDoorState();
     }
 
     // ---------------------------------------------------------
@@ -31,35 +40,75 @@ public class DoorExit : MonoBehaviour
     // ---------------------------------------------------------
     public void CheckExitCondition()
     {
-        // Check if we have reached the max value defined in your IntVariable
-        if (totalKeys.Value >= totalKeys.MaxValue)
+        UpdateDoorState();
+    }
+
+    private void UpdateDoorState()
+    {
+        if (totalKeys == null) return;
+
+        // Check if we have enough keys
+        bool conditionMet = totalKeys.Value >= totalKeys.MaxValue;
+
+        if (conditionMet)
         {
             UnlockDoor();
         }
         else
         {
-            Debug.Log($"Door Locked: {totalKeys.Value} / {totalKeys.MaxValue}");
+            LockDoor();
+        }
+    }
+
+    private void LockDoor()
+    {
+        isUnlocked = false;
+
+        // Visuals: Red Material (3D)
+        if (statusQuad && lockedMat)
+            statusQuad.material = lockedMat;
+
+        // Visuals: Closed Sprite (2D)
+        if (doorSpriteRenderer && lockedSprite)
+            doorSpriteRenderer.sprite = lockedSprite;
+
+        // Physics: Solid Wall (Not a trigger)
+        if (doorCollider)
+        {
+            doorCollider.enabled = true;
+            doorCollider.isTrigger = false;
         }
     }
 
     private void UnlockDoor()
     {
-        if (isUnlocked) return; // Prevent double unlocking
+        if (isUnlocked) return; // Don't run this twice
 
         isUnlocked = true;
         Debug.Log("DOOR UNLOCKED! ESCAPE ROUTE OPEN!");
 
-        // 1. Change the sprite to the "Open" version
-        if (doorRenderer != null && unlockedSprite != null)
+        // Visuals: Green Material (3D)
+        if (statusQuad && unlockedMat)
+            statusQuad.material = unlockedMat;
+
+        // Visuals: Open Sprite (2D)
+        if (doorSpriteRenderer && unlockedSprite)
+            doorSpriteRenderer.sprite = unlockedSprite;
+
+        // Physics: Walk-through Trigger (Allows winning)
+        if (doorCollider)
         {
-            doorRenderer.sprite = unlockedSprite;
+            doorCollider.enabled = true;
+            doorCollider.isTrigger = true;
         }
     }
 
-    // 2. Win when the player touches the door
+    // ---------------------------------------------------------
+    // WIN LOGIC (Runs when player walks into the open door)
+    // ---------------------------------------------------------
     private void OnTriggerEnter(Collider other)
     {
-        // Only allow win if unlocked and it's the player
+        // Only trigger if unlocked AND it's the player
         if (isUnlocked && other.CompareTag("Player"))
         {
             TriggerWin();
@@ -70,13 +119,13 @@ public class DoorExit : MonoBehaviour
     {
         Debug.Log("Player exited the level! You Win!");
 
-        // Option A: Raise the GameEvent (Best for decoupled logic)
+        // Option A: Raise Game Event
         if (onLevelComplete != null)
         {
             onLevelComplete.Raise();
         }
 
-        // Option B: Load the cutscene scene directly
+        // Option B: Load Cutscene/Menu
         if (!string.IsNullOrEmpty(cutsceneSceneName))
         {
             SceneManager.LoadScene(cutsceneSceneName);
