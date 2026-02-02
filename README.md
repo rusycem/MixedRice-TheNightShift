@@ -162,7 +162,7 @@ See [`ARTWORK_LICENSE.md`](ARTWORK_LICENSE.md) for full details.
 - Artwork & Visual Design: **Danial**
 - 3D Modelling & Rigging: **Syazwan**
 
---
+---
 
 ## ⚠️ Notice
 
