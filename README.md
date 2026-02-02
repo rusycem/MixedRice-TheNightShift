@@ -4,11 +4,19 @@
 > Powered by **Unity 3D**  
 > Developed by **Team MixedRice**
 >
+
 <div align=center>
 <img width="225" height="312" alt="MASK" src="https://github.com/user-attachments/assets/a0d8feed-f94e-49a5-bf9c-b571ba10840a" />
 </div>
 </br>
 
+<div align="center">
+  
+⚠️ **Notice** </br>
+All artwork in this folder is © 2026 [Zanial Danial](https://www.linkedin.com/in/zainal-danial-252131bb/). </br>
+Unauthorized use, modification, or redistribution is prohibited.
+
+</div>
 
 <div align="center">
 
@@ -160,7 +168,7 @@ See `ARTWORK_LICENSE.md` for full details.
 
 This project was developed within the time constraints of **Global Game Jam 2026** and is intended for **educational and portfolio purposes**.
 
-All artwork in this folder is © 2026 [Artist Name].
+All artwork in this folder is © 2026 **[Zainal Danial](https://www.linkedin.com/in/zainal-danial-252131bb/)**.
 Unauthorized use, modification, or redistribution is prohibited.
 
 
