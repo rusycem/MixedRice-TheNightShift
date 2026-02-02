@@ -135,8 +135,33 @@ Custom-designed 2D icons used throughout the UI:
 
 ---
 
-## 📌 Notes
+## 🎨 Artwork & Assets Notice
+
+All artwork assets (UI, icons, textures, and visual elements) used in this project were created by **[Zainal Danial](https://www.linkedin.com/in/zainal-danial-252131bb/)**.
+
+These assets are **NOT open-source** and are licensed under **CC BY-ND 4.0**.
+They may not be modified, reused, or redistributed outside this repository.
+
+See `ARTWORK_LICENSE.md` for full details.
+
+---
+
+## 👥 Credits
+
+- Game Development: Team MixedRice
+- Game & Level Design: **Amirrudin**
+- Programming: **Irfan**, **Joyce**, **Angel**
+- Artwork & Visual Design: **Danial**
+- 3D Modelling & Rigging: **Syazwan**
+
+--
+
+## ⚠️ Notice
 
 This project was developed within the time constraints of **Global Game Jam 2026** and is intended for **educational and portfolio purposes**.
+
+All artwork in this folder is © 2026 [Artist Name].
+Unauthorized use, modification, or redistribution is prohibited.
+
 
 ---
