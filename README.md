@@ -38,6 +38,11 @@ Players are trapped in a haunted environment and must explore, survive, and esca
 
 The game focuses on **atmosphere**, **resource management**, and **player tension**. [Download Full Game Here](https://gameloaded4hour.itch.io/the-night-shift).
 
+</br>
+
+⚠️ _**Warning**_: _This game includes loud audio effects, sudden jumpscares, and intense horror visuals that may be disturbing to some players._
+
+
 ---
 
 ## 🎯 Objective
