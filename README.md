@@ -150,7 +150,7 @@ All artwork assets (UI, icons, textures, and visual elements) used in this proje
 These assets are **NOT open-source** and are licensed under **CC BY-ND 4.0**.
 They may not be modified, reused, or redistributed outside this repository.
 
-See `ARTWORK_LICENSE.md` for full details.
+See [`ARTWORK_LICENSE.md`](ARTWORK_LICENSE.md) for full details.
 
 ---
 
