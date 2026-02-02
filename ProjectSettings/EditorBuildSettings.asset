@@ -6,8 +6,23 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
+    path: Assets/Scenes/FINAL ONLY/MainMenu.unity
+    guid: dd0fed3a5a8cd6c458266b6254f650a7
+  - enabled: 1
+    path: Assets/Scenes/FINAL ONLY/Cutscene.unity
+    guid: e5cbd43d04f5bc44cacc602e78fd1ae4
+  - enabled: 1
+    path: Assets/Scenes/FINAL ONLY/FinalLevel.unity
+    guid: b5701fc3f0393944c9d40a50b1f7fb92
+  - enabled: 1
+    path: Assets/Scenes/FINAL ONLY/WinScene.unity
+    guid: cd05663a6cc8bd748a44122c31b23a40
+  - enabled: 1
+    path: Assets/Scenes/BlockoutPiecesScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/EnemyAI.unity
+    guid: 29583714ed022864e8c594640813f8c0
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
