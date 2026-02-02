@@ -42,13 +42,15 @@ Survival is the only way out.
 
 ## 🖥️ In-Game UI
 
-- **Cutscene**
+### **Cutscene**
+
 <img width="4961" height="2503" alt="image" src="https://github.com/user-attachments/assets/80ebb54e-4770-4932-86ba-31b6e8aac536" />
 <img width="4961" height="2503" alt="image" src="https://github.com/user-attachments/assets/d5fb1507-a3f6-4ef3-aaa1-7185b12fa3da" />
 <img width="4961" height="2503" alt="image" src="https://github.com/user-attachments/assets/5711f09a-1cfc-4374-821a-f4c2b6480e10" />
 <img width="4961" height="2503" alt="image" src="https://github.com/user-attachments/assets/be53d729-99dd-4b35-8c8e-57333f099fb5" />
 
-- **Gameplay**
+### **Gameplay**
+
 <img width="1914" height="1079" alt="image" src="https://github.com/user-attachments/assets/716a05ab-3f6d-4896-8733-e5e9bc2b7889" />
 <img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/c78d2807-3317-43b6-8ea5-9e9da93d2de4" />
 
