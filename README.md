@@ -36,7 +36,7 @@ Unauthorized use, modification, or redistribution is prohibited.
 
 Players are trapped in a haunted environment and must explore, survive, and escape while being hunted by a supernatural enemy.
 
-The game focuses on **atmosphere**, **resource management**, and **player tension**.
+The game focuses on **atmosphere**, **resource management**, and **player tension**. [Download Full Game Here](https://gameloaded4hour.itch.io/the-night-shift).
 
 ---
 
