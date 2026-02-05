@@ -150,7 +150,7 @@ Custom-designed 2D icons used throughout the UI:
 
 ## 🎨 Artwork & Assets Notice
 
-All artwork assets (UI, icons, textures, and visual elements) used in this project were created by **[Zainal Danial](https://www.linkedin.com/in/zainal-danial-252131bb/)**.
+All artwork assets (UI, icons, textures, and visual elements) used in this project were created by **[Zainal Danial](https://www.linkedin.com/in/zainal-danial-252131bb/)** | [ArtStation](https://www.artstation.com/zdaniall?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQMMjU2MjgxMDQwNTU4AAGny00fmk_21_03Uhrn4S59kGiDAQvuzMEjf9eQvkAN-xdzAuOuons7uygyMgM_aem_e0cbZxnMHWpRLm_PHXJs6w).
 
 These assets are **NOT open-source** and are licensed under **CC BY-ND 4.0**.
 They may not be modified, reused, or redistributed outside this repository.
